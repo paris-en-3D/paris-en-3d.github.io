@@ -2,7 +2,7 @@
 
 Exploration interactive temps réel de Paris à l'échelle 1:1 directement dans le navigateur (WebGL / Three.js) :
 
-- **Démo en ligne :** https://lole1999.github.io/paris-3d/
+- **Démo en ligne :** https://paris-en-3d.github.io/
 
 ## Fonctionnalités principales
 
