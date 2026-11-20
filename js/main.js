@@ -4,6 +4,10 @@ import { buildParisWorld } from './paris-world.js';
 import { buildSaintEustacheMonument } from './monuments/saint-eustache.js';
 import { buildTourEiffelMonument } from './monuments/tour-eiffel.js';
 import { buildArcDeTriompheMonument } from './monuments/arc-de-triomphe.js';
+import { buildPalaisGarnierMonument } from './monuments/palais-garnier.js';
+import { buildNotreDameMonument } from './monuments/notre-dame.js';
+import { buildSacreCoeurMonument } from './monuments/sacre-coeur.js';
+import { buildPantheonMonument } from './monuments/pantheon.js';
 import { buildChampsElyseesAxe } from './monuments/champs-elysees.js';
 import { createLightingSystem } from './lighting.js';
 import { createCameraController } from './controls.js';
@@ -73,6 +77,23 @@ const ui = {
   cardEra: document.getElementById('poi-card-era'),
   cardTitle: document.getElementById('poi-card-title'),
   cardLocation: document.getElementById('poi-card-location'),
+  poiCardMedia: document.getElementById('poi-card-media'),
+  poiCardImg: document.getElementById('poi-card-img'),
+  poiPhotoBadge: document.getElementById('poi-photo-badge'),
+  poiPhotoPrev: document.getElementById('poi-photo-prev'),
+  poiPhotoCounter: document.getElementById('poi-photo-counter'),
+  poiPhotoNext: document.getElementById('poi-photo-next'),
+  btnPoiZoom: document.getElementById('btn-poi-zoom'),
+  poiCardCredit: document.getElementById('poi-card-credit'),
+  photoLightbox: document.getElementById('photo-lightbox'),
+  lightboxClose: document.getElementById('lightbox-close'),
+  lightboxPrev: document.getElementById('lightbox-prev'),
+  lightboxImg: document.getElementById('lightbox-img'),
+  lightboxNext: document.getElementById('lightbox-next'),
+  lightboxBadge: document.getElementById('lightbox-badge'),
+  lightboxCaption: document.getElementById('lightbox-caption'),
+  lightboxCounter: document.getElementById('lightbox-counter'),
+  lightboxCredit: document.getElementById('lightbox-credit'),
   cardHistory: document.getElementById('poi-card-history'),
   cardAnecdote: document.getElementById('poi-card-anecdote'),
   btnCardSpeak: document.getElementById('btn-card-speak'),
@@ -151,17 +172,37 @@ function initApp() {
   const tourEiffel = buildTourEiffelMonument(scene);
 
   // 4. Monument complet #3 : L'Arc de Triomphe & Place de l'Étoile (-3658, +18, -1156)
-  setLoading(76, "Érection de l'Arc de Triomphe (50 m) et de la Place Charles-de-Gaulle…");
+  setLoading(74, "Érection de l'Arc de Triomphe (50 m) et de la Place Charles-de-Gaulle…");
   const arcDeTriomphe = buildArcDeTriompheMonument(scene);
 
-  // 4b. Axe Historique complet : Avenue des Champs-Élysées → Rond-Point → Jardins, Palais & Concorde
-  setLoading(85, "Déploiement de l'Avenue des Champs-Élysées jusqu'à la Concorde…");
+  // 4b. Monument complet #4 : Le Palais Garnier & Place de l'Opéra (-980, 0, -956)
+  setLoading(78, "Édification du Palais Garnier, du Grand Escalier et de la Place de l'Opéra…");
+  const palaisGarnier = buildPalaisGarnierMonument(scene);
+
+  // 4c. Monument complet #5 : Cathédrale Notre-Dame de Paris (+358, +0.45, +1156)
+  setLoading(80, 'Élévation de Notre-Dame de Paris, de sa flèche à 96 m et de l’Île de la Cité…');
+  const notreDame = buildNotreDameMonument(scene);
+
+  // 4d. Monument complet #6 : Basilique du Sacré-Cœur & Butte Montmartre (-139, +90, -2591)
+  setLoading(83, 'Sculpture du Sacré-Cœur de Montmartre, du square Louise-Michel et du funiculaire…');
+  const sacreCoeur = buildSacreCoeurMonument(scene);
+
+  // 4e. Monument complet #7 : Le Panthéon & Place du Panthéon (+102, +26, +1913)
+  setLoading(86, 'Édification du Panthéon, de la triple coupole, du Pendule de Foucault et du Quartier Latin…');
+  const pantheon = buildPantheonMonument(scene);
+
+  // 4f. Axe Historique complet : Avenue des Champs-Élysées → Rond-Point → Jardins, Palais & Concorde
+  setLoading(89, "Déploiement de l'Avenue des Champs-Élysées jusqu'à la Concorde…");
   const champsElysees = buildChampsElyseesAxe(scene);
 
   const detailedModules = {
     'saint-eustache': saintEustache,
     'tour-eiffel': tourEiffel,
     'arc-de-triomphe': arcDeTriomphe,
+    'palais-garnier': palaisGarnier,
+    'notre-dame': notreDame,
+    'sacre-coeur': sacreCoeur,
+    'pantheon': pantheon,
   };
 
   // 4. Système solaire & ombres dynamiques
@@ -215,6 +256,10 @@ function initApp() {
     saintEustache,
     tourEiffel,
     arcDeTriomphe,
+    palaisGarnier,
+    notreDame,
+    sacreCoeur,
+    pantheon,
     livingWorld,
     ui,
   });
@@ -277,7 +322,13 @@ function initApp() {
           ? '⇄ Tour Eiffel'
           : mon.id === 'tour-eiffel'
             ? '⇄ Arc de Triomphe'
-            : '⇄ Saint-Eustache';
+            : mon.id === 'arc-de-triomphe'
+              ? '⇄ Palais Garnier'
+              : mon.id === 'palais-garnier'
+                ? '⇄ Notre-Dame'
+                : mon.id === 'notre-dame'
+                  ? '⇄ Sacré-Cœur'
+                  : '⇄ Saint-Eustache';
       ui.btnQuickHop.querySelector('span').textContent = nextHop;
     }
 
@@ -338,7 +389,15 @@ function initApp() {
         ? 'tour-eiffel'
         : activeMonumentId === 'tour-eiffel'
           ? 'arc-de-triomphe'
-          : 'saint-eustache';
+          : activeMonumentId === 'arc-de-triomphe'
+            ? 'palais-garnier'
+            : activeMonumentId === 'palais-garnier'
+              ? 'notre-dame'
+              : activeMonumentId === 'notre-dame'
+                ? 'sacre-coeur'
+                : activeMonumentId === 'sacre-coeur'
+                  ? 'pantheon'
+                  : 'saint-eustache';
     selectMonument(nextId);
   });
 
@@ -425,6 +484,10 @@ function initApp() {
     saintEustache.update(dt, nf, gg, activeMonumentId === 'saint-eustache');
     tourEiffel.update(dt, nf, sunDir);
     arcDeTriomphe.update(dt, nf);
+    palaisGarnier.update(dt, nf, activeMonumentId === 'palais-garnier');
+    notreDame.update(dt, nf, gg, activeMonumentId === 'notre-dame');
+    sacreCoeur.update(dt, nf, gg, activeMonumentId === 'sacre-coeur');
+    pantheon.update(dt, nf, gg, activeMonumentId === 'pantheon');
     champsElysees.update(dt, nf, camera.position);
     parisWorld.update(dt, nf, sunDir, scene.fog.color, scene.fog.density);
     livingWorld.update(dt, nf, activeMonumentId);

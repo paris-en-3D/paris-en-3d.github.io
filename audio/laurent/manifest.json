@@ -1,7 +1,7 @@
 {
   "voiceName": "Laurent",
   "voiceId": "k2OV0aefDPCq8foI",
-  "generatedAt": "2026-11-20T07:14:15+00:00",
+  "generatedAt": "2026-11-20T14:06:11+00:00",
   "tracks": {
     "saint-eustache/intro": {
       "file": "audio/laurent/saint-eustache/intro.mp3",
@@ -142,6 +142,106 @@
       "file": "audio/laurent/arc-de-triomphe/finale.mp3",
       "duration": 10.17,
       "sha1": "f8d5d564dbb1c10917d887723c56c817e3d2e1e2"
+    },
+    "palais-garnier/intro": {
+      "file": "audio/laurent/palais-garnier/intro.mp3",
+      "duration": 48.93,
+      "sha1": "ff16523c9510c098ed13536a2de67f6e2bfa388b"
+    },
+    "palais-garnier/garnier-facade-loggia": {
+      "file": "audio/laurent/palais-garnier/garnier-facade-loggia.mp3",
+      "duration": 43.29,
+      "sha1": "5d97d006866145ff4f1d4f6b01a1756846ae3eed"
+    },
+    "palais-garnier/garnier-coupole-apollon": {
+      "file": "audio/laurent/palais-garnier/garnier-coupole-apollon.mp3",
+      "duration": 38.47,
+      "sha1": "a96fe68f6223b9af4079a91d851bbfec28f85ce4"
+    },
+    "palais-garnier/garnier-grand-escalier": {
+      "file": "audio/laurent/palais-garnier/garnier-grand-escalier.mp3",
+      "duration": 38.84,
+      "sha1": "8f3010a26ac468ac647753b8e8ae9260fcf8c87c"
+    },
+    "palais-garnier/garnier-grand-foyer": {
+      "file": "audio/laurent/palais-garnier/garnier-grand-foyer.mp3",
+      "duration": 39.99,
+      "sha1": "fa0423ad5942cb37e40b539f5e8a9de9b75d54dd"
+    },
+    "palais-garnier/garnier-grande-salle-chagall": {
+      "file": "audio/laurent/palais-garnier/garnier-grande-salle-chagall.mp3",
+      "duration": 40.79,
+      "sha1": "3db0fe0f3ee11c16e1d50ac967fb94db4b237865"
+    },
+    "palais-garnier/garnier-pavillon-empereur": {
+      "file": "audio/laurent/palais-garnier/garnier-pavillon-empereur.mp3",
+      "duration": 37.33,
+      "sha1": "a3d0503329f035a8a79e9a5062a5824a667dd28c"
+    },
+    "palais-garnier/garnier-place-opera": {
+      "file": "audio/laurent/palais-garnier/garnier-place-opera.mp3",
+      "duration": 41.38,
+      "sha1": "d8390599db34c242b502411d32baf0dc63f5ccaa"
+    },
+    "palais-garnier/finale": {
+      "file": "audio/laurent/palais-garnier/finale.mp3",
+      "duration": 9.63,
+      "sha1": "9a91a30831a4f15ce67841060b9021ac19b2d873"
+    },
+    "notre-dame/intro": {
+      "file": "audio/laurent/notre-dame/intro.mp3",
+      "duration": 24.62,
+      "sha1": "27a0ef532ab03a9a158f73d7296e5832e925fab0"
+    },
+    "notre-dame/nd-facade-portails": {
+      "file": "audio/laurent/notre-dame/nd-facade-portails.mp3",
+      "duration": 25.05,
+      "sha1": "a471189c6bfba1f1f7bf48d4041b9ec0241a6878"
+    },
+    "notre-dame/nd-tours-chimeres": {
+      "file": "audio/laurent/notre-dame/nd-tours-chimeres.mp3",
+      "duration": 24.85,
+      "sha1": "452dbe20a41be3b3ac13ac543549e80f001d1a8e"
+    },
+    "notre-dame/nd-fleche-charpente": {
+      "file": "audio/laurent/notre-dame/nd-fleche-charpente.mp3",
+      "duration": 23.82,
+      "sha1": "b111177a2b389894220d90eafe57591eca08d59f"
+    },
+    "notre-dame/nd-grande-nef": {
+      "file": "audio/laurent/notre-dame/nd-grande-nef.mp3",
+      "duration": 21.18,
+      "sha1": "3e366a145b82c2f4e281003a7dba2e096a8a243a"
+    },
+    "notre-dame/nd-roses-vitraux": {
+      "file": "audio/laurent/notre-dame/nd-roses-vitraux.mp3",
+      "duration": 21.86,
+      "sha1": "33fce7ef59eef7a390e6b1b607b3d53509e21cd3"
+    },
+    "notre-dame/nd-choeur-pieta": {
+      "file": "audio/laurent/notre-dame/nd-choeur-pieta.mp3",
+      "duration": 22.74,
+      "sha1": "f04e3305e918a962bca2326a1a97562f48462770"
+    },
+    "notre-dame/nd-chevet-parvis": {
+      "file": "audio/laurent/notre-dame/nd-chevet-parvis.mp3",
+      "duration": 21.66,
+      "sha1": "9bc9f85c0b4dc7121d46cc6579f641a0e5b04999"
+    },
+    "notre-dame/finale": {
+      "file": "audio/laurent/notre-dame/finale.mp3",
+      "duration": 10.89,
+      "sha1": "f05df4ffd3c466230c3a892b1452b1611b0c0aee"
+    },
+    "sacre-coeur/intro": {
+      "file": "audio/laurent/sacre-coeur/intro.mp3",
+      "duration": 28.3,
+      "sha1": "176cc72faff874e27fec85664438ac0b16dd1645"
+    },
+    "sacre-coeur/sc-parvis-portique": {
+      "file": "audio/laurent/sacre-coeur/sc-parvis-portique.mp3",
+      "duration": 23.75,
+      "sha1": "3322c078d5de5c73250d6b00c5c85729a2bcf343"
     }
   }
 }

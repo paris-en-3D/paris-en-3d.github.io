@@ -1107,7 +1107,8 @@ export function buildChampsElyseesAxe(scene) {
       distSeg = Math.hypot(cameraPos.x - px, cameraPos.z - pz);
     }
 
-    // Masquage intelligent loin (Saint-Eustache = 1758 m) pour maintenir DC << 250
+    // Masquage intelligent loin (Saint-Eustache = 1758 m, Montmartre > 2800 m) pour maintenir DC << 250
+    champsStaticGroup.visible = distSeg < 2450;
     champsPolesInst.visible = distSeg < 950;
     champsGlobesInst.visible = distSeg < 2400;
     const showTraffic = distSeg < 1450;

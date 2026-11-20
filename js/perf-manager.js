@@ -15,6 +15,10 @@ const tmpRelMat = new THREE.Matrix4();
 const tmpEustachePos = new THREE.Vector3(0, 0, 0);
 const tmpEiffelPos = new THREE.Vector3(-3694, 0, 556);
 const tmpArcPos = new THREE.Vector3(-3658, 18, -1156);
+const tmpGarnierPos = new THREE.Vector3(-980, 0, -956);
+const tmpNotreDamePos = new THREE.Vector3(358, 0.45, 1156);
+const tmpSacreCoeurPos = new THREE.Vector3(-139, 90, -2591);
+const tmpPantheonPos = new THREE.Vector3(102, 26, 1913);
 
 export const QUALITY_PRESETS = {
   eco: {
@@ -33,6 +37,14 @@ export const QUALITY_PRESETS = {
     eiffelLod1: 1250,
     arcLod0: 180,
     arcLod1: 780,
+    garnierLod0: 175,
+    garnierLod1: 760,
+    notreDameLod0: 180,
+    notreDameLod1: 780,
+    sacreCoeurLod0: 195,
+    sacreCoeurLod1: 820,
+    pantheonLod0: 185,
+    pantheonLod1: 800,
     lifeMaxDist: 210,
     maxBoats: 3,
   },
@@ -52,6 +64,14 @@ export const QUALITY_PRESETS = {
     eiffelLod1: 1650,
     arcLod0: 260,
     arcLod1: 1100,
+    garnierLod0: 255,
+    garnierLod1: 1100,
+    notreDameLod0: 265,
+    notreDameLod1: 1150,
+    sacreCoeurLod0: 290,
+    sacreCoeurLod1: 1200,
+    pantheonLod0: 280,
+    pantheonLod1: 1180,
     lifeMaxDist: 380,
     maxBoats: 5,
   },
@@ -71,6 +91,14 @@ export const QUALITY_PRESETS = {
     eiffelLod1: 2400,
     arcLod0: 380,
     arcLod1: 1600,
+    garnierLod0: 370,
+    garnierLod1: 1600,
+    notreDameLod0: 385,
+    notreDameLod1: 1650,
+    sacreCoeurLod0: 410,
+    sacreCoeurLod1: 1700,
+    pantheonLod0: 400,
+    pantheonLod1: 1680,
     lifeMaxDist: 560,
     maxBoats: 5,
   },
@@ -266,6 +294,10 @@ export function createPerfManager({
   saintEustache,
   tourEiffel,
   arcDeTriomphe,
+  palaisGarnier,
+  notreDame,
+  sacreCoeur,
+  pantheon,
   livingWorld,
   ui,
 }) {
@@ -276,6 +308,10 @@ export function createPerfManager({
   let lastFps = 60;
   let lastDrawCalls = 0;
   let forceShadowNextFrame = true;
+
+  // Silhouette Skyline LOD Niveau 2 pour Saint-Eustache (> 980 m : 2 DC au lieu de ~45 DC)
+  const eustacheSkylineLod = buildSaintEustacheSkylineLOD();
+  scene.add(eustacheSkylineLod);
 
   function applyQualityButtonsUI() {
     if (!ui?.qualityBtns) return;
@@ -326,6 +362,10 @@ export function createPerfManager({
     const distEustache = camera.position.distanceTo(tmpEustachePos);
     const distEiffel = camera.position.distanceTo(tmpEiffelPos);
     const distArc = camera.position.distanceTo(tmpArcPos);
+    const distGarnier = camera.position.distanceTo(tmpGarnierPos);
+    const distNotreDame = camera.position.distanceTo(tmpNotreDamePos);
+    const distSacreCoeur = camera.position.distanceTo(tmpSacreCoeurPos);
+    const distPantheon = camera.position.distanceTo(tmpPantheonPos);
 
     // Distance horizontale de la caméra au segment Étoile (-3658, -1156) -> Concorde (-1741, -245)
     const ceDx = 1917;
@@ -339,15 +379,33 @@ export function createPerfManager({
     const lodEustache = computeLod(distEustache, p.eustacheLod0, p.eustacheLod1);
     const lodEiffel = computeLod(distEiffel, p.eiffelLod0, p.eiffelLod1);
     const lodArc = computeLod(distArc, p.arcLod0, p.arcLod1);
+    const lodGarnier = computeLod(distGarnier, p.garnierLod0, p.garnierLod1);
+    const lodNotreDame = computeLod(distNotreDame, p.notreDameLod0, p.notreDameLod1);
+    const lodSacreCoeur = computeLod(distSacreCoeur, p.sacreCoeurLod0, p.sacreCoeurLod1);
+    const lodPantheon = computeLod(distPantheon, p.pantheonLod0, p.pantheonLod1);
 
-    saintEustache.setLodLevel?.(lodEustache, distEustache);
+    if (lodEustache === 2 && saintEustache?.root) {
+      saintEustache.root.visible = false;
+      eustacheSkylineLod.visible = true;
+    } else {
+      eustacheSkylineLod.visible = false;
+      saintEustache.setLodLevel?.(lodEustache, distEustache);
+    }
 
     tourEiffel.setLodLevel?.(lodEiffel, distEiffel);
 
     arcDeTriomphe?.setLodLevel?.(lodArc, distArc);
 
+    palaisGarnier?.setLodLevel?.(lodGarnier, distGarnier);
+
+    notreDame?.setLodLevel?.(lodNotreDame, distNotreDame);
+
+    sacreCoeur?.setLodLevel?.(lodSacreCoeur, distSacreCoeur);
+
+    pantheon?.setLodLevel?.(lodPantheon, distPantheon);
+
     if (livingWorld?.root) {
-      livingWorld.root.visible = Math.min(distEustache, distEiffel, distArc, distChamps) < p.lifeMaxDist;
+      livingWorld.root.visible = Math.min(distEustache, distEiffel, distArc, distGarnier, distNotreDame, distSacreCoeur, distPantheon, distChamps) < p.lifeMaxDist;
     }
 
     const movedCell = lighting.updateShadowFocus(camera.position);

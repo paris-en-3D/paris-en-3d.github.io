@@ -274,6 +274,89 @@ function createRiverRoadTexture() {
   return tex;
 }
 
+function createMontparnasseTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 512;
+  const ctx = c.getContext('2d');
+
+  // Façades verre fumé bronze-ardoise avec léger dégradé de reflet céleste (jamais noir pur à l'ombre)
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, 512);
+  bgGrad.addColorStop(0, '#5a6a7d');
+  bgGrad.addColorStop(0.45, '#465260');
+  bgGrad.addColorStop(1, '#363f4b');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, 256, 512);
+
+  // 32 niveaux par tuile (allèges bronze-anthracite + bandeaux vitrés bleutés)
+  const floorH = 16;
+  for (let row = 0; row < 32; row++) {
+    const y = row * floorH;
+    const isTechFloor = row === 9 || row === 22;
+    // Allège structurelle sombre
+    ctx.fillStyle = isTechFloor ? '#262d36' : '#2e3640';
+    ctx.fillRect(0, y, 256, isTechFloor ? 10 : 5);
+    // Bandeau de fenêtres avec reflets de ciel nuancés par travée
+    if (!isTechFloor) {
+      for (let col = 0; col < 16; col++) {
+        const x = col * 16;
+        const shine = ((row * 13 + col * 29) % 7) / 7;
+        const r = Math.round(78 + shine * 34);
+        const g = Math.round(96 + shine * 42);
+        const b = Math.round(118 + shine * 48);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(x + 2, y + 6, 12, 9);
+      }
+    }
+  }
+
+  // Meneaux verticaux métalliques en aluminium brossé (signature visuelle de la Tour Montparnasse)
+  for (let col = 0; col < 16; col++) {
+    const x = col * 16;
+    ctx.fillStyle = col % 4 === 0 ? '#788492' : '#5e6a76';
+    ctx.fillRect(x, 0, col % 4 === 0 ? 2 : 1.2, 512);
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(2, 2);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+function createMontparnasseEmissiveTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 512;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, 256, 512);
+
+  const floorH = 16;
+  for (let row = 0; row < 32; row++) {
+    if (row === 9 || row === 22) continue;
+    const y = row * floorH;
+    const isTopDeck = row === 0 || row === 1;
+    const floorLitProb = isTopDeck ? 0.92 : ((row * 19) % 5 === 0 ? 0.65 : 0.24);
+    for (let col = 0; col < 16; col++) {
+      const h = ((row * 37 + col * 73 + row * col * 11) % 100) / 100;
+      if (h < floorLitProb) {
+        ctx.fillStyle = isTopDeck ? '#ffe8b6' : (col % 3 === 0 ? '#ffd28e' : '#fff0cf');
+        ctx.fillRect(col * 16 + 2, y + 6, 12, 8);
+      }
+    }
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(2, 2);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 function computeSplineNormals(points) {
   const normals = [];
   for (let i = 0; i < points.length; i++) {
@@ -323,6 +406,7 @@ function createOffsetRibbonGeometry(points, offsetAFn, offsetBFn, yLevel, uvVSca
   geo.computeVertexNormals();
   return geo;
 }
+
 
 // Crée un ruban de boulevard épousant le relief topographique de Paris (optionnellement en 2 bordures hors chaussée si innerHalfWidth > 0)
 function createTerrainRibbonGeometry(points, halfWidth, yOffset = 0.02, uvVScale = 26, innerHalfWidth = 0) {
@@ -380,6 +464,98 @@ function createTerrainRibbonGeometry(points, halfWidth, yOffset = 0.02, uvVScale
   return geo;
 }
 
+
+// Crée une ellipse/parc subdivisée épousant exactement le relief de Paris (zéro découpe sur les pentes !)
+function createTerrainEllipseGeometry(cx, cz, rx, rz, rotY = 0, yOffset = 0.14, rings = 7, segs = 28) {
+  const cosR = Math.cos(rotY);
+  const sinR = Math.sin(rotY);
+  const positions = [];
+  const uvs = [];
+  const indices = [];
+
+  positions.push(cx, getParisElevation(cx, cz) + yOffset, cz);
+  uvs.push(0.5, 0.5);
+
+  for (let r = 1; r <= rings; r++) {
+    const frac = r / rings;
+    // Bord légèrement abaissé pour fondre l'herbe dans le relief sans marche ni z-fighting
+    const edgeOff = r === rings ? yOffset * 0.45 : yOffset;
+    for (let s = 0; s < segs; s++) {
+      const a = (s / segs) * Math.PI * 2;
+      const lx = Math.cos(a) * rx * frac;
+      const lz = Math.sin(a) * rz * frac;
+      const wx = cx + lx * cosR + lz * sinR;
+      const wz = cz - lx * sinR + lz * cosR;
+      positions.push(wx, getParisElevation(wx, wz) + edgeOff, wz);
+      uvs.push(0.5 + 0.5 * frac * Math.cos(a), 0.5 + 0.5 * frac * Math.sin(a));
+    }
+  }
+
+  for (let s = 0; s < segs; s++) {
+    const cur = 1 + s;
+    const next = 1 + ((s + 1) % segs);
+    indices.push(0, next, cur);
+  }
+  for (let r = 1; r < rings; r++) {
+    const r0 = 1 + (r - 1) * segs;
+    const r1 = 1 + r * segs;
+    for (let s = 0; s < segs; s++) {
+      const sNext = (s + 1) % segs;
+      const i00 = r0 + s;
+      const i01 = r0 + sNext;
+      const i10 = r1 + s;
+      const i11 = r1 + sNext;
+      indices.push(i00, i01, i10, i01, i11, i10);
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+// Crée un rectangle subdivisé épousant le relief (squares de quartier & cours jardins sur collines)
+function createTerrainRectGeometry(cx, cz, w, d, rotY = 0, yOffset = 0.14, segs = 4) {
+  const cosR = Math.cos(rotY);
+  const sinR = Math.sin(rotY);
+  const positions = [];
+  const uvs = [];
+  const indices = [];
+
+  for (let iz = 0; iz <= segs; iz++) {
+    const vz = iz / segs;
+    const lz = (vz - 0.5) * d;
+    for (let ix = 0; ix <= segs; ix++) {
+      const vx = ix / segs;
+      const lx = (vx - 0.5) * w;
+      const wx = cx + lx * cosR + lz * sinR;
+      const wz = cz - lx * sinR + lz * cosR;
+      positions.push(wx, getParisElevation(wx, wz) + yOffset, wz);
+      uvs.push(vx, vz);
+    }
+  }
+  const stride = segs + 1;
+  for (let iz = 0; iz < segs; iz++) {
+    for (let ix = 0; ix < segs; ix++) {
+      const p00 = iz * stride + ix;
+      const p10 = p00 + 1;
+      const p01 = p00 + stride;
+      const p11 = p01 + 1;
+      indices.push(p00, p01, p10, p01, p11, p10);
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
+}
+
 // Crée un mur de quai en 3D (paroi verticale immergée jusqu'à yBottom + trottoir plat jusqu'à outerOffset)
 function createEmbankmentSideGeometry(points, innerFn, outerFn, yBottom, yTop, sideSign) {
   const positions = [];
@@ -426,6 +602,7 @@ function createEmbankmentSideGeometry(points, innerFn, outerFn, yBottom, yTop, s
   return geo;
 }
 
+
 // Crée une île (Île de la Cité / Île Saint-Louis) avec parois verticales immergées tout autour
 function createIslandWithWallsGeometry(points, halfWidthFn, yBottom, yTop) {
   const positions = [];
@@ -467,6 +644,7 @@ function createIslandWithWallsGeometry(points, halfWidthFn, yBottom, yTop) {
   geo.computeVertexNormals();
   return geo;
 }
+
 
 // Crée la géométrie d'eau de la Seine (u lateral 0..1 pour connaître la proximité des berges dans le shader)
 function createRiverRibbonGeometry(points, halfWidthFn, yLevel) {
@@ -605,6 +783,11 @@ export function buildParisWorld(scene) {
     color: 0xd3c8b2,
     roughness: 0.88,
   });
+  const matCanalWater = new THREE.MeshStandardMaterial({
+    color: 0x24586a,
+    roughness: 0.22,
+    metalness: 0.32,
+  });
   const matAvenueAsphalt = new THREE.MeshStandardMaterial({
     color: 0x3b3e44,
     roughness: 0.9,
@@ -641,8 +824,8 @@ export function buildParisWorld(scene) {
     side: THREE.DoubleSide,
   });
 
-  // Élargissement naturel autour de l'Île de la Cité (index 3) et Pont Neuf (index 4)
-  const seineWidthFn = (i) => (i === 2 || i === 3 || i === 4 ? 128 : 74);
+  // Élargissement naturel autour de l'Île Saint-Louis (2), Île de la Cité (3) et Pont Neuf (4)
+  const seineWidthFn = (i) => (i === 2 ? 142 : i === 3 ? 152 : i === 4 ? 128 : 74);
 
   function getSeineDistAndHalfWidth(wx, wz) {
     let minSq = Infinity;
@@ -675,6 +858,32 @@ export function buildParisWorld(scene) {
   const cosEI = Math.cos(eiffelInvRot);
   const sinEI = Math.sin(eiffelInvRot);
 
+  const garnierCenter = gpsToMeters(48.8720, 2.3316); // (-980, -956)
+  const garnierInvRot = -Math.atan2(58, 178);
+  const cosGI = Math.cos(garnierInvRot);
+  const sinGI = Math.sin(garnierInvRot);
+  const toGarnierLocal = (x, z) => {
+    const dx = x - garnierCenter.x;
+    const dz = z - garnierCenter.z;
+    return {
+      lx: dx * cosGI + dz * sinGI,
+      lz: -dx * sinGI + dz * cosGI,
+    };
+  };
+
+  const notreDameCenter = gpsToMeters(48.8530, 2.3499); // (+358, +1156)
+  const ndRot = -0.6727;
+  const cosND = Math.cos(ndRot);
+  const sinND = Math.sin(ndRot);
+  const toNotreDameLocal = (x, z) => {
+    const dx = x - notreDameCenter.x;
+    const dz = z - notreDameCenter.z;
+    return {
+      lx: dx * cosND - dz * sinND,
+      lz: dx * sinND + dz * cosND,
+    };
+  };
+
   const groundGeo = new THREE.PlaneGeometry(16000, 14000, 256, 224);
   groundGeo.rotateX(-Math.PI * 0.5);
   const posAttr = groundGeo.attributes.position;
@@ -689,7 +898,7 @@ export function buildParisWorld(scene) {
     const slopeDip = 0.20 * THREE.MathUtils.smoothstep(rawElev, 0.25, 3.8);
     let elev = rawElev - 0.06 - slopeDip;
 
-    // Dépression locale à -0,38 m (avec transition 18 m) sous les dalles basses Saint-Eustache & Tour Eiffel
+    // Dépression locale à -0,38 m (avec transition 18 m) sous les dalles basses Saint-Eustache, Tour Eiffel & Palais Garnier
     const eustRectD = Math.max(
       Math.min(
         Math.max(-144 - wx, wx - 140, -116 - wz, wz - 146),
@@ -706,7 +915,11 @@ export function buildParisWorld(scene) {
     const eiffRectD = Math.max(Math.abs(elx) - 248, -648 - elz, elz - 895, 0);
     const eiffBlend = 1.0 - THREE.MathUtils.smoothstep(eiffRectD, 0, 18);
 
-    const localDepress = Math.max(eustBlend, eiffBlend);
+    const { lx: glx, lz: glz } = toGarnierLocal(wx, wz);
+    const garnierRectD = Math.max(Math.abs(glx) - 102, -108 - glz, glz - 220, 0);
+    const garnierBlend = 1.0 - THREE.MathUtils.smoothstep(garnierRectD, 0, 18);
+
+    const localDepress = Math.max(eustBlend, eiffBlend, garnierBlend);
     elev = THREE.MathUtils.lerp(elev, rawElev - 0.38, localDepress);
 
     const { dist, hw } = getSeineDistAndHalfWidth(wx, wz);
@@ -773,18 +986,18 @@ export function buildParisWorld(scene) {
     gpsToMeters(48.8530, 2.3499), // Parvis & Notre-Dame
     gpsToMeters(48.8516, 2.3528), // Square Jean-XXIII (pointe Est)
   ];
-  const citeGeo = createIslandWithWallsGeometry(citePts, (i) => (i === 0 || i === 3 ? 32 : 76), -5.8, 0.45);
+  const citeGeo = createIslandWithWallsGeometry(citePts, (i) => (i === 0 ? 32 : i === 3 ? 48 : 78), -5.8, 0.45);
   const citeMesh = new THREE.Mesh(citeGeo, matQuayStone);
   citeMesh.receiveShadow = true;
   staticCityLandmarks.add(citeMesh);
 
-  // Île Saint-Louis (juste à l'Est de l'Île de la Cité)
+  // Île Saint-Louis (juste à l'Est de l'Île de la Cité, bien centrée entre les deux bras de Seine)
   const stLouisPts = [
-    gpsToMeters(48.8522, 2.3545),
-    gpsToMeters(48.8512, 2.3585),
-    gpsToMeters(48.8501, 2.3612),
+    { x: 665, z: 1274 },
+    { x: 915, z: 1378 },
+    { x: 1150, z: 1515 },
   ];
-  const stLouisGeo = createIslandWithWallsGeometry(stLouisPts, (i) => (i === 1 ? 58 : 28), -5.8, 0.45);
+  const stLouisGeo = createIslandWithWallsGeometry(stLouisPts, (i) => (i === 1 ? 60 : 32), -5.8, 0.45);
   const stLouisMesh = new THREE.Mesh(stLouisGeo, matQuayStone);
   stLouisMesh.receiveShadow = true;
   staticCityLandmarks.add(stLouisMesh);
@@ -898,10 +1111,46 @@ export function buildParisWorld(scene) {
   const champsLen = Math.hypot(arcCoords.x - concorde.x, arcCoords.z - concorde.z);
   const champsAngle = Math.atan2(arcCoords.z - concorde.z, arcCoords.x - concorde.x);
 
-  // Jardin du Luxembourg (à l'Ouest du Panthéon)
+  // Jardin du Luxembourg (à l'Ouest du Panthéon — pelouse conformée à la pente de Sainte-Geneviève + Palais du Sénat & Grand Bassin)
   const luxPos = gpsToMeters(48.8462, 2.3371);
-  const luxElev = getParisElevation(luxPos.x, luxPos.z);
-  addFlatZone(420, 440, luxPos.x, luxPos.z + 20, matParkLawn, 0, luxElev + 0.05);
+  const luxLawn = new THREE.Mesh(createTerrainRectGeometry(luxPos.x, luxPos.z + 20, 420, 440, 0, 0.16, 12), matParkLawn);
+  luxLawn.receiveShadow = true;
+  staticCityLandmarks.add(luxLawn);
+  const luxPathA = new THREE.Mesh(
+    createTerrainRibbonGeometry([{ x: luxPos.x - 195, z: luxPos.z + 20 }, { x: luxPos.x + 195, z: luxPos.z + 20 }], 6, 0.24, 22),
+    matParkPath
+  );
+  staticCityLandmarks.add(luxPathA);
+  const luxPathB = new THREE.Mesh(
+    createTerrainRibbonGeometry([{ x: luxPos.x, z: luxPos.z - 185 }, { x: luxPos.x, z: luxPos.z + 225 }], 6, 0.24, 22),
+    matParkPath
+  );
+  staticCityLandmarks.add(luxPathB);
+  const luxBasin = new THREE.Mesh(
+    createTerrainEllipseGeometry(luxPos.x, luxPos.z + 15, 36, 36, 0, 0.28, 3, 8),
+    matCanalWater
+  );
+  staticCityLandmarks.add(luxBasin);
+  {
+    const senatY = getParisElevation(luxPos.x, luxPos.z - 135);
+    const senatMain = new THREE.Mesh(new THREE.BoxGeometry(92, 20, 26), matLimestone);
+    senatMain.position.set(luxPos.x, senatY + 10, luxPos.z - 135);
+    staticCityLandmarks.add(senatMain);
+    const senatRoof = new THREE.Mesh(new THREE.BoxGeometry(94, 5.5, 24), matSlate);
+    senatRoof.position.set(luxPos.x, senatY + 22.5, luxPos.z - 135);
+    staticCityLandmarks.add(senatRoof);
+    [-38, 38].forEach((wx) => {
+      const wing = new THREE.Mesh(new THREE.BoxGeometry(18, 18, 52), matLimestone);
+      wing.position.set(luxPos.x + wx, senatY + 9, luxPos.z - 154);
+      staticCityLandmarks.add(wing);
+      const wRoof = new THREE.Mesh(new THREE.BoxGeometry(19, 4.5, 53), matSlate);
+      wRoof.position.set(luxPos.x + wx, senatY + 20.2, luxPos.z - 154);
+      staticCityLandmarks.add(wRoof);
+    });
+    const senatDome = new THREE.Mesh(new THREE.SphereGeometry(8.5, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), matSlate);
+    senatDome.position.set(luxPos.x, senatY + 25, luxPos.z - 135);
+    staticCityLandmarks.add(senatDome);
+  }
 
   // Bois de Boulogne (grand tapis forestier à l'extrême Ouest autour de la Fondation Louis Vuitton)
   const flvPos = gpsToMeters(48.8766, 2.2634);
@@ -1020,7 +1269,7 @@ export function buildParisWorld(scene) {
       trees: true,
       pts: [
         gpsToMeters(48.8698, 2.3245),
-        gpsToMeters(48.8706, 2.3322),
+        gpsToMeters(48.8704, 2.3324),
         gpsToMeters(48.8722, 2.3405),
         gpsToMeters(48.8698, 2.3505),
         gpsToMeters(48.8674, 2.3638),
@@ -1087,9 +1336,111 @@ export function buildParisWorld(scene) {
       trees: true,
       pts: [gpsToMeters(48.8542, 2.3268), gpsToMeters(48.8425, 2.3295), gpsToMeters(48.8345, 2.3325)],
     },
-    { width: 24, trees: true, pts: [gpsToMeters(48.8474, 2.3412), gpsToMeters(48.8463, 2.3446)] },
+    // Rue Soufflot : perspective rectiligne du Jardin du Luxembourg (Place Edmond-Rostand) jusqu'à la Place du Panthéon
+    { width: 24, trees: true, pts: [gpsToMeters(48.8472, 2.3401), { x: -18, z: 1881 }] },
     // Avenue de Breteuil (au Sud du Dôme des Invalides)
     { width: 42, trees: true, pts: [gpsToMeters(48.8522, 2.3122), gpsToMeters(48.8435, 2.3115)] },
+    // --- GRANDES PERCÉES HAUSSMANNIENNES, CEINTURES & DIAGONALES PARISIENNES (GPS 1:1) ---
+    // Ceinture Extérieure Nord : Courcelles -> Batignolles -> Clichy -> Pigalle -> Anvers -> Barbès -> Chapelle -> Stalingrad
+    {
+      width: 28,
+      trees: true,
+      pts: [
+        gpsToMeters(48.8794, 2.3088),
+        gpsToMeters(48.8825, 2.3202),
+        gpsToMeters(48.8837, 2.3274),
+        gpsToMeters(48.8822, 2.3374),
+        gpsToMeters(48.8830, 2.3435),
+        gpsToMeters(48.8838, 2.3496),
+        gpsToMeters(48.8842, 2.3595),
+        gpsToMeters(48.8842, 2.3702),
+      ],
+    },
+    // Avenue de Clichy & Avenue de Saint-Ouen (fourche Nord-Ouest depuis Place de Clichy)
+    { width: 22, trees: true, pts: [gpsToMeters(48.8837, 2.3274), gpsToMeters(48.8942, 2.3155)] },
+    { width: 22, trees: true, pts: [gpsToMeters(48.8837, 2.3274), gpsToMeters(48.8965, 2.3288)] },
+    // Boulevard Barbès & Boulevard Ornano (axe Nord-Sud à l'Est de la Butte Montmartre)
+    { width: 24, trees: true, pts: [gpsToMeters(48.8838, 2.3496), gpsToMeters(48.8920, 2.3474), gpsToMeters(48.8992, 2.3448)] },
+    // Boulevard Malesherbes (Madeleine -> Saint-Augustin -> Parc Monceau -> Porte d'Asnières)
+    {
+      width: 26,
+      trees: true,
+      pts: [
+        gpsToMeters(48.8698, 2.3245),
+        gpsToMeters(48.8754, 2.3198),
+        gpsToMeters(48.8825, 2.3105),
+        gpsToMeters(48.8915, 2.3015),
+      ],
+    },
+    // Rue Lafayette (grande diagonale Rive Droite : Chaussée d'Antin -> Gare du Nord -> Stalingrad -> La Villette)
+    {
+      width: 22,
+      trees: false,
+      pts: [
+        gpsToMeters(48.8738, 2.3365),
+        gpsToMeters(48.8768, 2.3472),
+        gpsToMeters(48.8798, 2.3568),
+        gpsToMeters(48.8842, 2.3702),
+        gpsToMeters(48.8895, 2.3855),
+      ],
+    },
+    // Ceinture Est : Boulevard de la Villette -> Belleville -> Ménilmontant -> Père-Lachaise
+    {
+      width: 26,
+      trees: true,
+      pts: [
+        gpsToMeters(48.8842, 2.3702),
+        gpsToMeters(48.8722, 2.3768),
+        gpsToMeters(48.8648, 2.3835),
+        gpsToMeters(48.8575, 2.3885),
+      ],
+    },
+    // Avenue de la République (République -> Père-Lachaise) & Faubourg Saint-Antoine (Bastille -> Nation)
+    { width: 26, trees: true, pts: [gpsToMeters(48.8674, 2.3638), gpsToMeters(48.8648, 2.3835)] },
+    { width: 22, trees: false, pts: [gpsToMeters(48.8532, 2.3692), gpsToMeters(48.8510, 2.3818), gpsToMeters(48.8484, 2.3958)] },
+    // Boulevard Voltaire prolongé -> Nation & Boulevard Diderot -> Gare de Lyon -> Nation
+    { width: 26, trees: true, pts: [gpsToMeters(48.8560, 2.3820), gpsToMeters(48.8484, 2.3958)] },
+    { width: 24, trees: true, pts: [gpsToMeters(48.8448, 2.3735), gpsToMeters(48.8468, 2.3845), gpsToMeters(48.8484, 2.3958)] },
+    // Boulevard du Montparnasse -> Place du 18-Juin-1940 -> Port-Royal -> Saint-Marcel (grande transversale Rive Gauche)
+    {
+      width: 28,
+      trees: true,
+      pts: [
+        gpsToMeters(48.8470, 2.3168),
+        gpsToMeters(48.8432, 2.3228),
+        gpsToMeters(48.8404, 2.3338),
+        gpsToMeters(48.8384, 2.3498),
+        gpsToMeters(48.8422, 2.3632),
+      ],
+    },
+    // Rue de Rennes -> Place du 18-Juin-1940 -> Avenue du Maine (contourne proprement l'esplanade Tour Montparnasse)
+    {
+      width: 22,
+      trees: false,
+      pts: [
+        gpsToMeters(48.8540, 2.3335),
+        gpsToMeters(48.8432, 2.3228),
+        gpsToMeters(48.8423, 2.3202),
+        gpsToMeters(48.8315, 2.3178),
+      ],
+    },
+    // Avenue des Gobelins -> Place d'Italie & Avenue Denfert-Rochereau / Général-Leclerc
+    { width: 26, trees: true, pts: [gpsToMeters(48.8384, 2.3498), gpsToMeters(48.8316, 2.3556)] },
+    { width: 26, trees: true, pts: [gpsToMeters(48.8404, 2.3338), gpsToMeters(48.8343, 2.3324), gpsToMeters(48.8235, 2.3268)] },
+    // Boulevard de Grenelle -> Garibaldi -> Pasteur -> Place du 18-Juin-1940 (axe ligne 6 Rive Gauche)
+    {
+      width: 26,
+      trees: true,
+      pts: [
+        gpsToMeters(48.8556, 2.2872),
+        gpsToMeters(48.8492, 2.2982),
+        gpsToMeters(48.8458, 2.3075),
+        gpsToMeters(48.8432, 2.3228),
+      ],
+    },
+    // Rue de Vaugirard (longue diagonale du 15e) & Avenue Mozart / Passy (16e)
+    { width: 20, trees: false, pts: [gpsToMeters(48.8485, 2.3345), gpsToMeters(48.8435, 2.3125), gpsToMeters(48.8365, 2.2925)] },
+    { width: 22, trees: true, pts: [gpsToMeters(48.8588, 2.2812), gpsToMeters(48.8520, 2.2712), gpsToMeters(48.8435, 2.2620)] },
   ];
   GRAND_AXES.forEach((ax) => addCityBoulevard(ax.pts, ax.width, { trees: ax.trees }));
 
@@ -1154,6 +1505,58 @@ export function buildParisWorld(scene) {
       const fig = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 2.2, 8, 10), matGold);
       fig.position.set(pos.x, py + 13, pos.z);
       staticCityLandmarks.add(fig);
+    } else if (ornament === 'fountain') {
+      const lawn = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.56, r * 0.58, 0.32, 24), matParkLawn);
+      lawn.position.set(pos.x, py + 0.28, pos.z);
+      staticCityLandmarks.add(lawn);
+      const rim = new THREE.Mesh(new THREE.CylinderGeometry(10.5, 11.2, 1.3, 20), matLimestone);
+      rim.position.set(pos.x, py + 0.85, pos.z);
+      staticCityLandmarks.add(rim);
+      const pool = new THREE.Mesh(new THREE.CylinderGeometry(9.4, 9.4, 0.9, 20), matGlassLOD);
+      pool.position.set(pos.x, py + 1.05, pos.z);
+      staticCityLandmarks.add(pool);
+      const jet = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 2.4, 5.5, 10), matLimestone);
+      jet.position.set(pos.x, py + 3.4, pos.z);
+      staticCityLandmarks.add(jet);
+    } else if (ornament === 'rotunda') {
+      // Rotonde de la Villette (Claude-Nicolas Ledoux, Place de Stalingrad)
+      const base = new THREE.Mesh(new THREE.BoxGeometry(28, 12, 28), matLimestone);
+      base.position.set(pos.x, py + 6, pos.z);
+      staticCityLandmarks.add(base);
+      const drum = new THREE.Mesh(new THREE.CylinderGeometry(11.5, 12.2, 13, 20), matLimestone);
+      drum.position.set(pos.x, py + 18, pos.z);
+      staticCityLandmarks.add(drum);
+      const cap = new THREE.Mesh(new THREE.ConeGeometry(12.2, 5, 20), matSlate);
+      cap.position.set(pos.x, py + 27, pos.z);
+      staticCityLandmarks.add(cap);
+    } else if (ornament === 'dome') {
+      // Église à coupole type Saint-Augustin
+      const body = new THREE.Mesh(new THREE.BoxGeometry(26, 20, 34), matLimestone);
+      body.position.set(pos.x, py + 10, pos.z);
+      staticCityLandmarks.add(body);
+      const drum = new THREE.Mesh(new THREE.CylinderGeometry(10, 11, 14, 18), matLimestone);
+      drum.position.set(pos.x, py + 27, pos.z);
+      staticCityLandmarks.add(drum);
+      const cup = new THREE.Mesh(new THREE.SphereGeometry(10.2, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), matPatinaCopper);
+      cup.position.set(pos.x, py + 34, pos.z);
+      staticCityLandmarks.add(cup);
+    } else if (ornament === 'lion') {
+      // Lion de Belfort (Bartholdi) sur la Place Denfert-Rochereau
+      const ped = new THREE.Mesh(new THREE.BoxGeometry(10, 6.5, 6.5), matLimestone);
+      ped.position.set(pos.x, py + 3.25, pos.z);
+      staticCityLandmarks.add(ped);
+      const lion = new THREE.Mesh(new THREE.BoxGeometry(7.2, 4.2, 3.4), matPatinaCopper);
+      lion.position.set(pos.x, py + 8.5, pos.z);
+      staticCityLandmarks.add(lion);
+    }
+
+    // Couronne d'arbres autour des grandes places rondes (>= 56 m)
+    if (r >= 56 && ornament !== 'temple') {
+      const nTrees = Math.min(14, Math.floor(r / 5.5));
+      for (let t = 0; t < nTrees; t++) {
+        const a = (t / nTrees) * Math.PI * 2;
+        registerCityTree(pos.x + Math.cos(a) * (r * 0.52), pos.z + Math.sin(a) * (r * 0.52));
+      }
     }
   }
 
@@ -1161,14 +1564,255 @@ export function buildParisWorld(scene) {
   addCircularPlaza({ lat: 48.8532, lon: 2.3692, r: 66, ornament: 'column-gold' });   // Place de la Bastille
   addCircularPlaza({ lat: 48.8675, lon: 2.3294, r: 56, ornament: 'column-bronze' }); // Place Vendôme
   addCircularPlaza({ lat: 48.8698, lon: 2.3245, r: 64, ornament: 'temple' });        // Place de la Madeleine
-  addCircularPlaza({ lat: 48.8704, lon: 2.3324, r: 56, ornament: 'none' });          // Place de l'Opéra
   addCircularPlaza({ lat: 48.8584, lon: 2.3474, r: 52, ornament: 'column-gold' });   // Place du Châtelet
+  addCircularPlaza({ lat: 48.8837, lon: 2.3274, r: 54, ornament: 'statue' });        // Place de Clichy
+  addCircularPlaza({ lat: 48.8822, lon: 2.3374, r: 44, ornament: 'fountain' });      // Place Pigalle
+  addCircularPlaza({ lat: 48.8484, lon: 2.3958, r: 84, ornament: 'statue' });        // Place de la Nation
+  addCircularPlaza({ lat: 48.8316, lon: 2.3556, r: 70, ornament: 'fountain' });      // Place d'Italie
+  addCircularPlaza({ lat: 48.8343, lon: 2.3324, r: 62, ornament: 'lion' });          // Place Denfert-Rochereau
+  addCircularPlaza({ lat: 48.8842, lon: 2.3702, r: 58, ornament: 'rotunda' });       // Stalingrad / Rotonde de la Villette
+  addCircularPlaza({ lat: 48.8754, lon: 2.3198, r: 48, ornament: 'dome' });          // Place Saint-Augustin
+  addCircularPlaza({ lat: 48.8509, lon: 2.3335, r: 52, ornament: 'fountain' });      // Place Saint-Sulpice
+  addCircularPlaza({ lat: 48.8696, lon: 2.2852, r: 44, ornament: 'fountain' });      // Place Victor-Hugo
+  addCircularPlaza({ lat: 48.8691, lon: 2.3411, r: 54, ornament: 'temple' });        // Place de la Bourse (Palais Brongniart)
+  addCircularPlaza({ lat: 48.8782, lon: 2.2828, r: 56, ornament: 'fountain' });      // Place de la Porte-Maillot
 
-  // Parc Monceau (grand parc vert arboré)
+  // --- CANAL SAINT-MARTIN & BASSIN DE LA VILLETTE (Ruban d'eau bordé de platanes, 10e/11e/19e) ---
+  const canalPts = [
+    gpsToMeters(48.8532, 2.3692), // Port de l'Arsenal / Bastille
+    gpsToMeters(48.8690, 2.3672), // Quai de Valmy / République
+    gpsToMeters(48.8768, 2.3652), // Écluses Saint-Martin
+    gpsToMeters(48.8842, 2.3702), // Stalingrad / Rotonde
+    gpsToMeters(48.8918, 2.3822), // Bassin de la Villette
+  ];
+  const canalRibbonGeo = createTerrainRibbonGeometry(canalPts, 16, 0.08, 28);
+  const canalMesh = new THREE.Mesh(canalRibbonGeo, matCanalWater);
+  canalMesh.receiveShadow = true;
+  staticCityLandmarks.add(canalMesh);
+  const canalQuayGeo = createTerrainRibbonGeometry(canalPts, 24, 0.04, 28);
+  const canalQuayMesh = new THREE.Mesh(canalQuayGeo, matParkPath);
+  canalQuayMesh.receiveShadow = true;
+  staticCityLandmarks.add(canalQuayMesh);
+  for (let i = 0; i < canalPts.length - 1; i++) {
+    const a = canalPts[i];
+    const b = canalPts[i + 1];
+    const len = Math.hypot(b.x - a.x, b.z - a.z) || 1;
+    const nx = -(b.z - a.z) / len;
+    const nz = (b.x - a.x) / len;
+    const steps = Math.floor(len / 34);
+    for (let k = 1; k < steps; k++) {
+      const t = k / steps;
+      const mx = THREE.MathUtils.lerp(a.x, b.x, t);
+      const mz = THREE.MathUtils.lerp(a.z, b.z, t);
+      registerCityTree(mx + nx * 21, mz + nz * 21);
+      registerCityTree(mx - nx * 21, mz - nz * 21);
+    }
+  }
+
+  // --- GRANDS PARCS, CIMETIÈRES BOISÉS, GARES PARISIENNES & TOUR MONTPARNASSE (GPS 1:1) ---
+  const cityParks = [];
+  function addParisPark({ lat, lon, rx, rz, trees = 32, hasLake = false, hasSibylle = false, hasGreenhouse = false, rotY = 0 }) {
+    const pos = gpsToMeters(lat, lon);
+    const py = getParisElevation(pos.x, pos.z);
+    cityParks.push({ x: pos.x, z: pos.z, rx, rz });
+
+    // Pelouse elliptique subdivisée épousant exactement le relief (aucune découpe sur Montmartre / Sainte-Geneviève)
+    const lawn = new THREE.Mesh(
+      createTerrainEllipseGeometry(pos.x, pos.z, rx, rz, rotY, 0.16, 8, 28),
+      matParkLawn
+    );
+    lawn.receiveShadow = true;
+    staticCityLandmarks.add(lawn);
+
+    // Allées sablées en croix conformées au relief à travers le parc
+    const cosR = Math.cos(rotY);
+    const sinR = Math.sin(rotY);
+    const pA0 = { x: pos.x - rx * 0.90 * cosR, z: pos.z + rx * 0.90 * sinR };
+    const pA1 = { x: pos.x + rx * 0.90 * cosR, z: pos.z - rx * 0.90 * sinR };
+    const pB0 = { x: pos.x - rz * 0.90 * sinR, z: pos.z - rz * 0.90 * cosR };
+    const pB1 = { x: pos.x + rz * 0.90 * sinR, z: pos.z + rz * 0.90 * cosR };
+    const pathA = new THREE.Mesh(createTerrainRibbonGeometry([pA0, pA1], 4.2, 0.24, 18), matParkPath);
+    pathA.receiveShadow = true;
+    staticCityLandmarks.add(pathA);
+    const pathB = new THREE.Mesh(createTerrainRibbonGeometry([pB0, pB1], 4.2, 0.24, 18), matParkPath);
+    pathB.receiveShadow = true;
+    staticCityLandmarks.add(pathB);
+
+    if (hasLake) {
+      const lake = new THREE.Mesh(
+        createTerrainEllipseGeometry(pos.x, pos.z, rx * 0.36, rz * 0.36, rotY, 0.28, 4, 22),
+        matCanalWater
+      );
+      staticCityLandmarks.add(lake);
+      if (hasSibylle) {
+        // Rocher central & Temple de la Sibylle (Buttes-Chaumont)
+        const rock = new THREE.Mesh(new THREE.ConeGeometry(28, 28, 10), matBridgeStone);
+        rock.position.set(pos.x, py + 14, pos.z);
+        staticCityLandmarks.add(rock);
+        const temple = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 6.0, 9.5, 12), matLimestone);
+        temple.position.set(pos.x, py + 31, pos.z);
+        staticCityLandmarks.add(temple);
+        const dome = new THREE.Mesh(new THREE.SphereGeometry(5.8, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), matLimestone);
+        dome.position.set(pos.x, py + 35.8, pos.z);
+        staticCityLandmarks.add(dome);
+      }
+    }
+
+    if (hasGreenhouse) {
+      const gx = pos.x + rx * 0.22;
+      const gz = pos.z - rz * 0.2;
+      const gy = getParisElevation(gx, gz);
+      const serre = new THREE.Mesh(new THREE.BoxGeometry(46, 15, 22), matGlassLOD);
+      serre.position.set(gx, gy + 7.5, gz);
+      staticCityLandmarks.add(serre);
+    }
+
+    for (let t = 0; t < trees; t++) {
+      const a = (t / trees) * Math.PI * 2 + (t % 3) * 0.27;
+      const frac = 0.48 + ((t * 17) % 10) * 0.044;
+      registerCityTree(pos.x + Math.cos(a) * rx * frac, pos.z + Math.sin(a) * rz * frac);
+    }
+  }
+
+  addParisPark({ lat: 48.8809, lon: 2.3828, rx: 220, rz: 185, trees: 46, hasLake: true, hasSibylle: true }); // Parc des Buttes-Chaumont
+  addParisPark({ lat: 48.8614, lon: 2.3934, rx: 245, rz: 215, trees: 54 });                                   // Cimetière du Père-Lachaise
+  addParisPark({ lat: 48.8878, lon: 2.3302, rx: 145, rz: 170, trees: 36 });                                   // Cimetière de Montmartre (Ouest du Sacré-Cœur !)
+  addParisPark({ lat: 48.8439, lon: 2.3598, rx: 185, rz: 125, trees: 34, hasGreenhouse: true });              // Jardin des Plantes
+  addParisPark({ lat: 48.8648, lon: 2.3375, rx: 64,  rz: 108, trees: 20 });                                   // Jardin du Palais-Royal
+  addParisPark({ lat: 48.8902, lon: 2.3168, rx: 140, rz: 120, trees: 28, hasLake: true });                    // Parc Martin-Luther-King (Batignolles)
+  addParisPark({ lat: 48.8222, lon: 2.3382, rx: 185, rz: 150, trees: 38, hasLake: true });                    // Parc Montsouris
+  addParisPark({ lat: 48.8415, lon: 2.2750, rx: 165, rz: 128, trees: 28, hasGreenhouse: true });              // Parc André-Citroën
+
+  // 4 Grandes Gares Parisiennes (halles verrières courbes & façades Beaux-Arts + Tour de l'Horloge Gare de Lyon)
+  function addParisTrainStation({ lat, lon, w, d, rotY = 0, hasClockTower = false }) {
+    const pos = gpsToMeters(lat, lon);
+    const py = getParisElevation(pos.x, pos.z);
+    cityParks.push({ x: pos.x, z: pos.z, rx: Math.max(w, d) * 0.62, rz: Math.max(w, d) * 0.62 });
+    const g = new THREE.Group();
+    g.position.set(pos.x, py, pos.z);
+    g.rotation.y = rotY;
+    const parvis = new THREE.Mesh(new THREE.BoxGeometry(w + 26, 0.3, d + 26), matParkPath);
+    parvis.position.y = 0.08;
+    g.add(parvis);
+    // Bâtiment voyageurs en pierre de taille
+    const head = new THREE.Mesh(new THREE.BoxGeometry(w, 22, 24), matLimestone);
+    head.position.set(0, 11, d * 0.5 - 12);
+    g.add(head);
+    const headRoof = new THREE.Mesh(new THREE.BoxGeometry(w + 2, 5, 22), matSlate);
+    headRoof.position.set(0, 24.5, d * 0.5 - 12);
+    g.add(headRoof);
+    // Double grande halle verrière métallique courbe
+    [-w * 0.24, w * 0.24].forEach((hx) => {
+      const hall = new THREE.Mesh(
+        new THREE.CylinderGeometry(w * 0.22, w * 0.22, d - 24, 14, 1, false, 0, Math.PI),
+        matGlassLOD
+      );
+      hall.rotation.set(Math.PI * 0.5, 0, -Math.PI * 0.5);
+      hall.position.set(hx, 12, -12);
+      g.add(hall);
+    });
+    if (hasClockTower) {
+      // Beffroi / Tour de l'Horloge de la Gare de Lyon (67 m)
+      const tower = new THREE.Mesh(new THREE.BoxGeometry(11, 56, 11), matLimestone);
+      tower.position.set(-w * 0.42, 28, d * 0.5 - 8);
+      g.add(tower);
+      const spire = new THREE.Mesh(new THREE.ConeGeometry(7.2, 12, 4), matSlate);
+      spire.position.set(-w * 0.42, 62, d * 0.5 - 8);
+      spire.rotation.y = Math.PI * 0.25;
+      g.add(spire);
+      const dial = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, 0.6, 14), matGold);
+      dial.rotation.x = Math.PI * 0.5;
+      dial.position.set(-w * 0.42, 46, d * 0.5 - 2.3);
+      g.add(dial);
+    }
+    staticCityLandmarks.add(g);
+  }
+
+  addParisTrainStation({ lat: 48.8809, lon: 2.3553, w: 118, d: 155, rotY: 0.14 });                      // Gare du Nord
+  addParisTrainStation({ lat: 48.8768, lon: 2.3592, w: 108, d: 145, rotY: 0.08 });                      // Gare de l'Est
+  addParisTrainStation({ lat: 48.8760, lon: 2.3252, w: 122, d: 135, rotY: -0.22 });                     // Gare Saint-Lazare
+  addParisTrainStation({ lat: 48.8448, lon: 2.3735, w: 112, d: 152, rotY: -0.68, hasClockTower: true }); // Gare de Lyon (Beffroi 67 m)
+
+  // Tour Montparnasse (210 m — mur-rideau verre bronze & aluminium brossé, socle Maine-Montparnasse & terrasse panoramique)
+  const matMontparnasse = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    map: createMontparnasseTexture(),
+    emissive: new THREE.Color(0xffc978),
+    emissiveMap: createMontparnasseEmissiveTexture(),
+    emissiveIntensity: 0.08,
+    roughness: 0.34,
+    metalness: 0.32,
+  });
+  {
+    const mpPos = gpsToMeters(48.8421, 2.3219);
+    const mpY = getParisElevation(mpPos.x, mpPos.z);
+    cityParks.push({ x: mpPos.x, z: mpPos.z, rx: 86, rz: 86 });
+    const mpGroup = new THREE.Group();
+    mpGroup.position.set(mpPos.x, mpY, mpPos.z);
+    mpGroup.rotation.y = 0.46;
+
+    // Parvis minéral & socle commercial Maine-Montparnasse
+    const mpBase = new THREE.Mesh(new THREE.BoxGeometry(108, 0.35, 96), matParkPath);
+    mpBase.position.y = 0.12;
+    mpBase.receiveShadow = true;
+    mpGroup.add(mpBase);
+    const mpPodium = new THREE.Mesh(new THREE.BoxGeometry(82, 14, 52), matLimestone);
+    mpPodium.position.set(0, 7, 16);
+    mpGroup.add(mpPodium);
+    const mpPodiumGlass = new THREE.Mesh(new THREE.BoxGeometry(83, 6.5, 48), matGlassLOD);
+    mpPodiumGlass.position.set(0, 7.5, 16);
+    mpGroup.add(mpPodiumGlass);
+
+    // Silhouette en amande / facettée de 59 étages (210 m) à double corps croisé pour des UV parfaitement nets
+    const mpCoreMain = new THREE.Mesh(new THREE.BoxGeometry(42, 210, 36), matMontparnasse);
+    mpCoreMain.position.set(0, 105, -2);
+    mpCoreMain.castShadow = true;
+    mpGroup.add(mpCoreMain);
+    const mpCoreWings = new THREE.Mesh(new THREE.BoxGeometry(58, 210, 22), matMontparnasse);
+    mpCoreWings.position.set(0, 105, -2);
+    mpCoreWings.castShadow = true;
+    mpGroup.add(mpCoreWings);
+
+    // Couronnement terrasse panoramique 59e étage + garde-corps métallique + mât technique
+    const mpCrown = new THREE.Mesh(new THREE.BoxGeometry(59.5, 3.6, 23.5), matSlate);
+    mpCrown.position.set(0, 211.5, -2);
+    mpGroup.add(mpCrown);
+    const mpCrownCenter = new THREE.Mesh(new THREE.BoxGeometry(43.5, 3.6, 37.5), matSlate);
+    mpCrownCenter.position.set(0, 211.5, -2);
+    mpGroup.add(mpCrownCenter);
+    const mpPenthouse = new THREE.Mesh(new THREE.BoxGeometry(24, 5.5, 16), matBridgeStone);
+    mpPenthouse.position.set(0, 215.5, -2);
+    mpGroup.add(mpPenthouse);
+    const mpMast = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.55, 14, 8), matBridgeStone);
+    mpMast.position.set(0, 224.5, -2);
+    mpGroup.add(mpMast);
+
+    staticCityLandmarks.add(mpGroup);
+  }
+
+  // Église Saint-Sulpice (façade classique à deux tours asymétriques bordant la Place Saint-Sulpice)
+  {
+    const ssPos = gpsToMeters(48.8509, 2.3348);
+    const ssY = getParisElevation(ssPos.x, ssPos.z);
+    cityParks.push({ x: ssPos.x, z: ssPos.z, rx: 64, rz: 48 });
+    const ssBody = new THREE.Mesh(new THREE.BoxGeometry(88, 26, 46), matLimestone);
+    ssBody.position.set(ssPos.x + 28, ssY + 13, ssPos.z);
+    staticCityLandmarks.add(ssBody);
+    [-16, 16].forEach((tz, ti) => {
+      const hT = ti === 0 ? 73 : 68;
+      const tMesh = new THREE.Mesh(new THREE.BoxGeometry(12, hT, 12), matLimestone);
+      tMesh.position.set(ssPos.x - 14, ssY + hT * 0.5, ssPos.z + tz);
+      staticCityLandmarks.add(tMesh);
+    });
+  }
+
+  // Parc Monceau (grand parc vert arboré conformé au relief)
   const monceauPos = gpsToMeters(48.8794, 2.3088);
   cityPlaces.push({ x: monceauPos.x, z: monceauPos.z, r: 115 });
-  const monceauLawn = new THREE.Mesh(new THREE.CylinderGeometry(112, 114, 0.22, 32), matParkLawn);
-  monceauLawn.position.set(monceauPos.x, getParisElevation(monceauPos.x, monceauPos.z) + 0.04, monceauPos.z);
+  const monceauLawn = new THREE.Mesh(
+    createTerrainEllipseGeometry(monceauPos.x, monceauPos.z, 113, 113, 0, 0.12, 6, 30),
+    matParkLawn
+  );
   monceauLawn.receiveShadow = true;
   staticCityLandmarks.add(monceauLawn);
   for (let a = 0; a < 18; a++) {
@@ -1343,6 +1987,27 @@ export function buildParisWorld(scene) {
     // Place de l'Étoile & Hôtels des Maréchaux (Arc de Triomphe complet)
     if (Math.hypot(x - arcCoords.x, z - arcCoords.z) < 146) return true;
 
+    // Palais Garnier & Place de l'Opéra (modélisé en haute fidélité dans palais-garnier.js)
+    const { lx: glx, lz: glz } = toGarnierLocal(x, z);
+    if (Math.abs(glx) < 100 && glz > -106 && glz < 194) return true;
+    if (Math.abs(glx) < 80 && glz >= 194 && glz < 226) return true;
+
+    // Cathédrale Notre-Dame, Parvis & Square Jean-XXIII sur l'Île de la Cité
+    const { lx: ndx, lz: ndz } = toNotreDameLocal(x, z);
+    if (ndx > -168 && ndx < 155 && Math.abs(ndz) < 82) return true;
+
+    // Basilique du Sacré-Cœur, Parvis, Square Louise-Michel, Funiculaire, Rue Ronsard & Place du Tertre (Butte Montmartre)
+    const slx = x - (-139);
+    const slz = z - (-2591);
+    if (slx > -148 && slx < 134 && slz > -74 && slz < 292) return true;
+
+    // Le Panthéon, Place du Panthéon, Faculté de Droit, Mairie du 5e, Bibliothèque Sainte-Geneviève, Saint-Étienne-du-Mont & Henri-IV
+    const pdx = x - 102;
+    const pdz = z - 1913;
+    const plx = pdx * 0.9656 - pdz * (-0.2600);
+    const plz = pdx * (-0.2600) + pdz * 0.9656;
+    if (plx > -126 && plx < 122 && Math.abs(plz) < 98) return true;
+
     // Axe complet des Champs-Élysées -> Rond-Point -> Jardins & Palais -> Concorde
     const { lx, lz } = toChampsLocal(x, z);
     if (lz >= 142 && lz <= 1105 && Math.abs(lx) < 64) return true;
@@ -1355,8 +2020,31 @@ export function buildParisWorld(scene) {
     return false;
   }
 
+  const louvrePos = gpsToMeters(48.8606, 2.3376);
+  const cosLouvre = Math.cos(-0.43);
+  const sinLouvre = Math.sin(-0.43);
+  function isInsideLouvre(px, pz, margin = 0) {
+    const dx = px - louvrePos.x;
+    const dz = pz - louvrePos.z;
+    const lx = dx * cosLouvre - dz * sinLouvre;
+    const lz = dx * sinLouvre + dz * cosLouvre;
+    return lx > -226 - margin && lx < 164 + margin && Math.abs(lz) < 138 + margin;
+  }
+
+  const orsayPos = gpsToMeters(48.8600, 2.3266);
+  function isInsideOrsay(px, pz, margin = 0) {
+    const dx = px - orsayPos.x;
+    const dz = pz - orsayPos.z;
+    const lx = dx * cosLouvre - dz * sinLouvre;
+    const lz = dx * sinLouvre + dz * cosLouvre;
+    return Math.abs(lx) < 116 + margin && Math.abs(lz) < 66 + margin;
+  }
+
   function isPointBlockedForBuilding(px, pz) {
     if (isInsideDetailedDistrict(px, pz)) return true;
+    if (isInsideLouvre(px, pz, 14) || isInsideOrsay(px, pz, 10)) return true;
+    // Zone radiale de l'Étoile (r = 146 .. 442 m) : urbanisée ci-dessous en îlots trapézoïdaux concentriques
+    if (Math.hypot(px - arcCoords.x, pz - arcCoords.z) < 442) return true;
 
     // Marges Champs-Élysées / rues transversales / Grand & Petit Palais / Concorde
     const { lx, lz } = toChampsLocal(px, pz);
@@ -1369,15 +2057,22 @@ export function buildParisWorld(scene) {
     if (lz > 1385 && lz < 1805 && lx > -306 && lx < -74) return true;
     if (lz > 1975 && lz <= 2275 && lx > -134 && lx < 182) return true;
 
-    // La Seine + Quais + Voies sur berges (marge 25 m au-delà du lit)
+    // La Seine + Quais + Voies sur berges (marge 25 m au-delà du lit) & Canal Saint-Martin
     const { dist, hw } = getSeineDistAndHalfWidth(px, pz);
     if (dist < hw + 25) return true;
+    if (distanceToPolyline(px, pz, canalPts) < 32) return true;
 
-    // Grands boulevards & Grandes places
+    // Grands boulevards, Grandes places, Parcs, Cimetières & Gares parisiennes
     if (isNearBoulevard(px, pz, 5.5)) return true;
     for (let i = 0; i < cityPlaces.length; i++) {
       const pl = cityPlaces[i];
       if (Math.hypot(px - pl.x, pz - pl.z) < pl.r + 8) return true;
+    }
+    for (let i = 0; i < cityParks.length; i++) {
+      const pk = cityParks[i];
+      const dx = (px - pk.x) / (pk.rx + 12);
+      const dz = (pz - pk.z) / (pk.rz + 12);
+      if (dx * dx + dz * dz < 1.0) return true;
     }
 
     // Parcs parisiens & Axe Tuileries / Invalides
@@ -1386,10 +2081,10 @@ export function buildParisWorld(scene) {
     if (Math.abs(px - luxPos.x) < 215 && Math.abs(pz - luxPos.z - 20) < 225) return true;
     if (px < -4920) return true;
 
-    // Empreintes des 10 monuments LOD (excluant Saint-Eustache & Tour Eiffel déjà couverts)
+    // Empreintes des monuments LOD (excluant les 6 monuments complets déjà couverts)
     for (let i = 0; i < MONUMENTS.length; i++) {
       const m = MONUMENTS[i];
-      if (m.id === 'tour-eiffel' || m.id === 'saint-eustache' || m.id === 'arc-de-triomphe') continue;
+      if (m.id === 'tour-eiffel' || m.id === 'saint-eustache' || m.id === 'arc-de-triomphe' || m.id === 'palais-garnier' || m.id === 'notre-dame' || m.id === 'sacre-coeur' || m.id === 'pantheon') continue;
       if (Math.hypot(px - m.pos.x, pz - m.pos.z) < Math.max(48, m.exclusionRadius - 18)) return true;
     }
     return false;
@@ -1452,9 +2147,9 @@ export function buildParisWorld(scene) {
 
   const STEP = 104;
   const COL_MIN = -50;
-  const COL_MAX = 23;
-  const ROW_MIN = -30;
-  const ROW_MAX = 25;
+  const COL_MAX = 42;
+  const ROW_MIN = -44;
+  const ROW_MAX = 44;
   const occupiedCells = new Set();
 
   const wingTransforms = [];
@@ -1469,18 +2164,31 @@ export function buildParisWorld(scene) {
       const x = col * STEP + STEP * 0.5;
       const z = row * STEP + STEP * 0.5;
 
-      // Forme circulaire globale de Paris intra-muros
-      const rx = (x + 1700) / 4400;
-      const rz = z / 3200;
-      if (rx * rx + rz * rz > 1.05) continue;
+      // Forme complète de Paris intra-muros (Nord Montmartre, Est Nation/Père-Lachaise, Sud Montparnasse/Denfert/Italie/Montsouris, Ouest 16e)
+      const rx = x < 0 ? x / 5250 : x / 4350;
+      const rz = z < 0 ? z / 4450 : z / 4550;
+      if (rx * rx + rz * rz > 1.06) continue;
 
       const dBlvd = minBoulevardDistance(x, z);
       const { dist: dSeine } = getSeineDistAndHalfWidth(x, z);
-      const nearDiag = dBlvd < 145 || dSeine < 165;
+      const nearDiag = dBlvd < 225 || dSeine < 195;
 
-      const rotY = nearDiag ? findNearestUrbanOrientation(x, z, 0) : 0;
-      const bw = nearDiag ? 50 + rand() * 6 : 68 + rand() * 6;
-      const bd = nearDiag ? 46 + rand() * 5 : 66 + rand() * 6;
+      // Orientation organique par secteur parisien (casse l'effet damier uniforme !)
+      const sectorAngle =
+        x < -2200 && z > 200
+          ? -0.22 // 15e / 16e Sud-Ouest
+          : x > 650 && z < -450
+            ? 0.16 // 10e / 19e Canal & Villette
+            : x > 650 && z > 350
+              ? -0.14 // 11e / 12e Bastille / Nation
+              : z > 950
+                ? 0.11 // Rive Gauche 5e / 13e / 14e
+                : z < -1500
+                  ? -0.09 // Nord 17e / 18e Montmartre
+                  : 0.0;
+      const rotY = nearDiag ? findNearestUrbanOrientation(x, z, sectorAngle) : sectorAngle;
+      const bw = nearDiag ? 52 + rand() * 8 : 66 + rand() * 9;
+      const bd = nearDiag ? 48 + rand() * 7 : 64 + rand() * 9;
 
       if (!canPlaceBlock(x, z, bw, bd, rotY)) continue;
       occupiedCells.add(`${col},${row}`);
@@ -1489,42 +2197,596 @@ export function buildParisWorld(scene) {
       const sinR = Math.sin(rotY);
 
       const elev = getParisElevation(x, z);
-      const yBase = elev - 0.65;
       const montmartreFactor = Math.max(0, Math.min(1, (elev - 28) / 55));
-      const hBase = (18.5 + rand() * 5.2) * (1 - montmartreFactor * 0.25) + 0.5;
+      const hBase = (18.0 + rand() * 6.2) * (1 - montmartreFactor * 0.24) + 0.5;
 
-      const wingD = nearDiag ? 12.8 + rand() * 2.0 : 14.8 + rand() * 2.2;
-      const openEast = rand() > 0.78;
-      const innerSpan = Math.max(12, bd - wingD * 2);
-
-      const localWings = [
-        [0, -(bd - wingD) * 0.5, bw, wingD, 0],
-        [0, +(bd - wingD) * 0.5, bw, wingD, 0.5],
-        [-(bw - wingD) * 0.5, 0, wingD, innerSpan, -0.4],
-      ];
-      if (!openEast) {
-        localWings.push([+(bw - wingD) * 0.5, 0, wingD, innerSpan, 0.35]);
+      // ~4 % d'îlots ordinaires deviennent de charmants squares parisiens arborés de quartier !
+      const typoRoll = rand();
+      if (typoRoll < 0.042 && dBlvd > 48 && Math.hypot(x, z) > 420) {
+        const sqLawn = new THREE.Mesh(createTerrainRectGeometry(x, z, bw * 0.9, bd * 0.9, rotY, 0.14, 3), matParkLawn);
+        sqLawn.receiveShadow = true;
+        staticCityLandmarks.add(sqLawn);
+        const sqPathA = new THREE.Mesh(createTerrainRectGeometry(x, z, bw * 0.92, 5.2, rotY, 0.22, 3), matParkPath);
+        staticCityLandmarks.add(sqPathA);
+        const sqPathB = new THREE.Mesh(createTerrainRectGeometry(x, z, 5.2, bd * 0.92, rotY, 0.22, 3), matParkPath);
+        staticCityLandmarks.add(sqPathB);
+        [[-0.28, -0.28], [0.28, -0.28], [-0.28, 0.28], [0.28, 0.28], [0, 0]].forEach(([fx, fz]) => {
+          const tx = x + (fx * bw) * cosR + (fz * bd) * sinR;
+          const tz = z - (fx * bw) * sinR + (fz * bd) * cosR;
+          registerCityTree(tx, tz);
+        });
+        continue;
       }
 
-      const stoneSeed = Math.floor(rand() * 4);
-      const roofSeed = Math.floor(rand() * 4);
+      const wingD = nearDiag ? 12.6 + rand() * 2.4 : 14.2 + rand() * 2.8;
+      const innerSpan = Math.max(12, bd - wingD * 2);
+      const stoneBase = Math.floor(rand() * 8);
+      const roofBase = Math.floor(rand() * 8);
+      const localWings = [];
+
+      // 6 Typologies architecturales parisiennes variées (casse la répétition de carrés identiques !)
+      if (typoRoll < 0.36) {
+        // Typo 1 : Îlot découpé en 6 immeubles mitoyens de hauteurs & teintes variées (vrai parcellaire parisien !)
+        const hw = bw * 0.48;
+        const hd = bd * 0.48;
+        localWings.push(
+          [-bw * 0.25, -(bd - wingD) * 0.5, hw, wingD, (rand() - 0.5) * 4.2, stoneBase, roofBase],
+          [+bw * 0.25, -(bd - wingD) * 0.5, hw, wingD, (rand() - 0.5) * 4.5, (stoneBase + 2) % 8, (roofBase + 1) % 8],
+          [-bw * 0.25, +(bd - wingD) * 0.5, hw, wingD, (rand() - 0.5) * 4.4, (stoneBase + 3) % 8, (roofBase + 3) % 8],
+          [+bw * 0.25, +(bd - wingD) * 0.5, hw, wingD, (rand() - 0.5) * 4.0, (stoneBase + 1) % 8, (roofBase + 2) % 8],
+          [-(bw - wingD) * 0.5, 0, wingD, hd, (rand() - 0.5) * 3.8, (stoneBase + 4) % 8, (roofBase + 4) % 8],
+          [+(bw - wingD) * 0.5, 0, wingD, hd, (rand() - 0.5) * 3.8, (stoneBase + 5) % 8, (roofBase + 5) % 8]
+        );
+      } else if (typoRoll < 0.56) {
+        // Typo 2 : Grand îlot Haussmannien fermé classique + arbre de cour intérieure
+        localWings.push(
+          [0, -(bd - wingD) * 0.5, bw, wingD, 0.2, stoneBase, roofBase],
+          [0, +(bd - wingD) * 0.5, bw, wingD, 0.8, stoneBase, roofBase],
+          [-(bw - wingD) * 0.5, 0, wingD, innerSpan, -0.6, (stoneBase + 1) % 8, roofBase],
+          [+(bw - wingD) * 0.5, 0, wingD, innerSpan, 0.4, (stoneBase + 1) % 8, (roofBase + 1) % 8]
+        );
+        if (rand() < 0.55) registerCityTree(x, z);
+      } else if (typoRoll < 0.72) {
+        // Typo 3 : Îlot en U ouvert sur jardin intérieur verdoyant (orienté selon 4 directions)
+        const openSide = Math.floor(rand() * 4);
+        if (openSide !== 0) localWings.push([0, -(bd - wingD) * 0.5, bw, wingD, 0.4, stoneBase, roofBase]);
+        if (openSide !== 1) localWings.push([0, +(bd - wingD) * 0.5, bw, wingD, -0.5, (stoneBase + 2) % 8, (roofBase + 1) % 8]);
+        if (openSide !== 2) localWings.push([-(bw - wingD) * 0.5, 0, wingD, innerSpan, 0.6, stoneBase, roofBase]);
+        if (openSide !== 3) localWings.push([+(bw - wingD) * 0.5, 0, wingD, innerSpan, -0.3, (stoneBase + 1) % 8, (roofBase + 2) % 8]);
+        const cLawn = new THREE.Mesh(createTerrainRectGeometry(x, z, bw * 0.46, bd * 0.46, rotY, 0.13, 2), matParkLawn);
+        staticCityLandmarks.add(cLawn);
+        registerCityTree(x, z);
+      } else if (typoRoll < 0.86) {
+        // Typo 4 : Double barre parisienne séparée par une cité / passage piéton arboré
+        const verticalBars = rand() < 0.5;
+        if (verticalBars) {
+          localWings.push(
+            [-(bw * 0.30), 0, wingD * 1.15, bd, (rand() - 0.5) * 3.0, stoneBase, roofBase],
+            [+(bw * 0.30), 0, wingD * 1.15, bd, (rand() - 0.5) * 3.5, (stoneBase + 3) % 8, (roofBase + 2) % 8]
+          );
+        } else {
+          localWings.push(
+            [0, -(bd * 0.30), bw, wingD * 1.15, (rand() - 0.5) * 3.0, stoneBase, roofBase],
+            [0, +(bd * 0.30), bw, wingD * 1.15, (rand() - 0.5) * 3.5, (stoneBase + 4) % 8, (roofBase + 3) % 8]
+          );
+        }
+        registerCityTree(x, z);
+      } else {
+        // Typo 5 : Îlot en L + immeuble d'angle indépendant (pan coupé) + jardin d'angle
+        localWings.push(
+          [0, -(bd - wingD) * 0.5, bw, wingD, 0.8, stoneBase, roofBase],
+          [-(bw - wingD) * 0.5, wingD * 0.5, wingD, bd - wingD, -0.8, (stoneBase + 1) % 8, (roofBase + 1) % 8],
+          [+bw * 0.24, +bd * 0.24, bw * 0.42, bd * 0.42, 2.2, (stoneBase + 5) % 8, (roofBase + 4) % 8]
+        );
+        registerCityTree(x - bw * 0.14 * cosR + bd * 0.14 * sinR, z + bw * 0.14 * sinR + bd * 0.14 * cosR);
+      }
+
       for (let wi = 0; wi < localWings.length; wi++) {
-        const [lx, lz, ww, wd, dh] = localWings[wi];
+        const [lx, lz, ww, wd, dh, sSeed, rSeed] = localWings[wi];
         const wx = x + lx * cosR + lz * sinR;
         const wz = z - lx * sinR + lz * cosR;
+        // Chaque aile épouse exactement la pente locale de Montmartre avec fondation profonde (zéro bâtiment dans le vide !)
+        const wingElev = getParisElevation(wx, wz);
+        const sink = wingElev > 3.5 ? 6.5 : 0.65;
         wingTransforms.push({
           x: wx,
-          y: yBase,
+          y: wingElev - sink,
           z: wz,
           w: ww,
           d: wd,
-          h: hBase + dh,
+          h: Math.max(11.5, hBase + dh) + (sink - 0.65),
           rotY,
-          stoneSeed,
-          roofSeed,
+          stoneSeed: sSeed,
+          roofSeed: rSeed,
         });
       }
     }
+  }
+
+  /**
+   * ==========================================================================
+   * URBANISME COMPLET DE L'ÎLE DE LA CITÉ & DE L'ÎLE SAINT-LOUIS
+   * Monuments historiques (Sainte-Chapelle, Conciergerie, Palais de Justice,
+   * Tribunal de Commerce, Préfecture), Place Dauphine, Île Saint-Louis & 7 ponts
+   * ==========================================================================
+   */
+  const islandTreeCoords = [];
+  const samplePolylineSeg = (pts, segIdx, t, lat = 0) => {
+    const a = pts[segIdx];
+    const b = pts[segIdx + 1];
+    const dx = b.x - a.x;
+    const dz = b.z - a.z;
+    const len = Math.hypot(dx, dz) || 1;
+    const ux = dx / len;
+    const uz = dz / len;
+    const nx = -uz;
+    const nz = ux;
+    return {
+      x: a.x + dx * t + nx * lat,
+      z: a.z + dz * t + nz * lat,
+      rotY: -Math.atan2(dz, dx),
+    };
+  };
+  const addIslandBox = (pts, segIdx, t, lat, w, h, d, yBase, mat) => {
+    const p = samplePolylineSeg(pts, segIdx, t, lat);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(p.x, yBase + h * 0.5, p.z);
+    m.rotation.y = p.rotY;
+    m.castShadow = h > 4;
+    m.receiveShadow = true;
+    staticCityLandmarks.add(m);
+    return m;
+  };
+  const addIslandCyl = (pts, segIdx, t, lat, rt, rb, h, seg, yBase, mat) => {
+    const p = samplePolylineSeg(pts, segIdx, t, lat);
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat);
+    m.position.set(p.x, yBase + h * 0.5, p.z);
+    m.rotation.y = p.rotY;
+    m.castShadow = h > 4;
+    m.receiveShadow = true;
+    staticCityLandmarks.add(m);
+    return m;
+  };
+  const addIslandWing = (pts, segIdx, t, lat, w, d, h, stoneSeed = 0, roofSeed = 0) => {
+    const p = samplePolylineSeg(pts, segIdx, t, lat);
+    wingTransforms.push({ x: p.x, y: 0.45, z: p.z, w, d, h, rotY: p.rotY, stoneSeed, roofSeed });
+  };
+  const addIslandTree = (pts, segIdx, t, lat) => {
+    const p = samplePolylineSeg(pts, segIdx, t, lat);
+    islandTreeCoords.push([p.x, p.z, 0.46]);
+  };
+  const addIslandBridgeSpan = (pts, segIdx, t, latFrom, latTo, width, style = 'stone') => {
+    const latMid = (latFrom + latTo) * 0.5;
+    const span = Math.abs(latTo - latFrom);
+    const p = samplePolylineSeg(pts, segIdx, t, latMid);
+    const deckY = 1.65;
+    const stoneMat = style === 'iron' ? matSlate : matBridgeStone;
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(width, 1.35, span), stoneMat);
+    deck.position.set(p.x, deckY, p.z);
+    deck.rotation.y = p.rotY;
+    deck.castShadow = true;
+    deck.receiveShadow = true;
+    staticCityLandmarks.add(deck);
+    const road = new THREE.Mesh(new THREE.BoxGeometry(width - 2.6, 0.24, span + 2), matAvenueAsphalt);
+    road.position.set(p.x, deckY + 0.72, p.z);
+    road.rotation.y = p.rotY;
+    staticCityLandmarks.add(road);
+    [-width * 0.47, width * 0.47].forEach((ox) => {
+      const pp = samplePolylineSeg(pts, segIdx, t, latMid);
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.95, span), stoneMat);
+      rail.position.set(pp.x + ox * Math.cos(pp.rotY), deckY + 1.15, pp.z - ox * Math.sin(pp.rotY));
+      rail.rotation.y = pp.rotY;
+      staticCityLandmarks.add(rail);
+    });
+  };
+
+  // --- 1. POINTE OUEST : SQUARE DU VERT-GALANT, HENRI IV & PLACE DAUPHINE ---
+  addIslandBox(citePts, 0, 0.08, 0, 56, 0.25, 34, 0.42, matParkLawn);
+  addIslandBox(citePts, 0, 0.08, 0, 48, 0.28, 6, 0.43, matParkPath);
+  [0.03, 0.06, 0.09, 0.12].forEach((t) => {
+    addIslandTree(citePts, 0, t, -13);
+    addIslandTree(citePts, 0, t, 13);
+  });
+  // Statue équestre d'Henri IV au terre-plein du Pont Neuf
+  addIslandBox(citePts, 0, 0.16, 0, 8.5, 4.2, 5.5, 0.45, matBridgeStone);
+  addIslandBox(citePts, 0, 0.16, 0, 4.2, 3.2, 2.2, 4.65, matPatinaCopper);
+
+  // Place Dauphine : deux ailes triangulaires Louis XIII & mail planté central
+  addIslandBox(citePts, 0, 0.31, 0, 74, 0.24, 34, 0.43, matParkPath);
+  addIslandWing(citePts, 0, 0.30, -24, 68, 12.5, 16.5, 1, 1);
+  addIslandWing(citePts, 0, 0.30, 24, 68, 12.5, 16.5, 1, 1);
+  addIslandWing(citePts, 0, 0.40, -18, 12, 24, 16.5, 0, 2);
+  addIslandWing(citePts, 0, 0.40, 18, 12, 24, 16.5, 0, 2);
+  [0.24, 0.29, 0.34, 0.39].forEach((t) => {
+    addIslandTree(citePts, 0, t, -11);
+    addIslandTree(citePts, 0, t, 11);
+  });
+
+  // --- 2. PALAIS DE JUSTICE, CONCIERGERIE & SAINTE-CHAPELLE ---
+  // Quadrilatère du Palais de Justice & Cour du Mai
+  addIslandBox(citePts, 0, 0.69, -4, 138, 0.25, 118, 0.44, matParkPath);
+  addIslandBox(citePts, 0, 0.50, -4, 18, 22, 82, 0.45, matParisWhite);
+  addIslandBox(citePts, 0, 0.50, -4, 19, 5, 83, 22.45, matSlate);
+  addIslandBox(citePts, 0, 0.72, -32, 116, 20, 18, 0.45, matLimestone);
+  addIslandBox(citePts, 0, 0.72, -32, 117, 4.8, 19, 20.45, matSlate);
+  addIslandBox(citePts, 0, 0.72, 28, 116, 20, 18, 0.45, matLimestone);
+  addIslandBox(citePts, 0, 0.72, 28, 117, 4.8, 19, 20.45, matSlate);
+  addIslandWing(citePts, 0, 0.64, 52, 86, 15, 20, 0, 0);
+  addIslandWing(citePts, 0, 0.85, 52, 58, 15, 20, 2, 1);
+  // Aile Est sur le Boulevard du Palais (Cour du Mai & grille dorée)
+  addIslandBox(citePts, 0, 0.94, 24, 14, 21, 56, 0.45, matParisWhite);
+  addIslandBox(citePts, 0, 0.94, 24, 15, 5.5, 57, 21.45, matSlate);
+  addIslandBox(citePts, 0, 0.95, -4, 1.2, 4.5, 42, 0.45, matGold);
+  // Pavillon central en coupole du Palais de Justice
+  addIslandBox(citePts, 0, 0.68, -4, 26, 26, 26, 0.45, matParisWhite);
+  addIslandBox(citePts, 0, 0.68, -4, 20, 9, 20, 26.45, matSlate);
+  addIslandCyl(citePts, 0, 0.68, -4, 0.8, 2.2, 6, 8, 35.45, matGold);
+
+  // La Conciergerie (façade gothique sur Quai de l'Horloge + 3 tours poivrières + Tour de l'Horloge)
+  addIslandBox(citePts, 0, 0.74, -56, 128, 22, 19, 0.45, matLimestone);
+  addIslandBox(citePts, 0, 0.74, -56, 129, 7, 17, 22.45, matSlate);
+  [0.62, 0.72, 0.82].forEach((tt) => {
+    addIslandCyl(citePts, 0, tt, -66, 4.6, 4.9, 25, 12, 0.45, matLimestone);
+    addIslandCyl(citePts, 0, tt, -66, 0.25, 5.2, 9.5, 12, 25.45, matSlate);
+  });
+  // Tour de l'Horloge (angle NE, 37 m + horloge dorée)
+  addIslandBox(citePts, 0, 0.96, -62, 9.5, 31, 9.5, 0.45, matLimestone);
+  addIslandBox(citePts, 0, 0.96, -62, 5.5, 8.5, 5.5, 31.45, matSlate);
+  addIslandCyl(citePts, 0, 0.975, -62, 1.8, 1.8, 10.2, 12, 20.0, matGold);
+
+  // La Sainte-Chapelle (joyau gothique rayonnant & flèche de 75 m !)
+  addIslandBox(citePts, 0, 0.81, 14, 38, 33, 13.5, 0.45, matParisWhite);
+  addIslandBox(citePts, 0, 0.81, 14, 34, 24, 14.2, 6.0, matGlassLOD);
+  addIslandBox(citePts, 0, 0.81, 14, 38.6, 10.5, 12.6, 33.45, matSlate);
+  addIslandCyl(citePts, 0, 0.81, 14, 0.3, 2.2, 32, 8, 42.5, matGold);
+
+  // --- 3. SECTEUR CENTRAL : BOULEVARD DU PALAIS, TRIBUNAL DE COMMERCE, MARCHÉ AUX FLEURS & PRÉFECTURE ---
+  addIslandBox(citePts, 1, 0.04, 0, 18, 0.26, 152, 0.44, matAvenueAsphalt);
+  addIslandBox(citePts, 1, 0.62, 0, 16, 0.26, 152, 0.44, matAvenueAsphalt);
+  // Quais périphériques (Quai de la Corse Nord, Quai du Marché-Neuf Sud)
+  addIslandBox(citePts, 0, 0.56, -73, 355, 0.26, 11, 0.44, matAvenueAsphalt);
+  addIslandBox(citePts, 0, 0.56, 73, 355, 0.26, 11, 0.44, matAvenueAsphalt);
+  addIslandBox(citePts, 1, 0.33, -73, 250, 0.26, 11, 0.44, matAvenueAsphalt);
+  addIslandBox(citePts, 1, 0.33, 73, 250, 0.26, 11, 0.44, matAvenueAsphalt);
+
+  // Tribunal de Commerce (quadrilatère + Dôme de 45 m côté Seine)
+  addIslandWing(citePts, 1, 0.14, -40, 14, 52, 19.5, 2, 0);
+  addIslandWing(citePts, 1, 0.30, -40, 14, 52, 19.5, 2, 0);
+  addIslandWing(citePts, 1, 0.22, -16, 62, 14, 19.5, 0, 1);
+  addIslandWing(citePts, 1, 0.22, -60, 62, 16, 20.5, 2, 2);
+  addIslandCyl(citePts, 1, 0.22, -62, 7.6, 8.2, 11, 16, 20.5, matParisWhite);
+  addIslandCyl(citePts, 1, 0.22, -62, 2.6, 7.8, 12.5, 16, 31.5, matPatinaCopper);
+  addIslandCyl(citePts, 1, 0.22, -62, 0.3, 1.5, 6.5, 8, 43.5, matGold);
+
+  // Place Louis-Lépine & Marché aux Fleurs Reine-Elizabeth-II
+  addIslandBox(citePts, 1, 0.46, -42, 72, 0.24, 58, 0.44, matParkPath);
+  [[-55, 0.40], [-32, 0.40], [-55, 0.52], [-32, 0.52]].forEach(([lat, tt]) => {
+    addIslandBox(citePts, 1, tt, lat, 22, 4.2, 11, 0.45, matPatinaCopper);
+    addIslandBox(citePts, 1, tt, lat, 23, 1.4, 12, 4.65, matSlate);
+  });
+  [0.39, 0.46, 0.53].forEach((tt) => {
+    addIslandTree(citePts, 1, tt, -21);
+    addIslandTree(citePts, 1, tt, -66);
+  });
+
+  // Cour d'Appel / Bâtiments Sud-Ouest (Quai du Marché-Neuf) & Caserne de la Cité / Préfecture de Police
+  addIslandWing(citePts, 1, 0.19, 40, 56, 42, 19.5, 1, 2);
+  // Préfecture de Police (fermant tout le côté Ouest du Parvis Notre-Dame !)
+  addIslandWing(citePts, 1, 0.44, 54, 108, 16, 20.5, 0, 1);
+  addIslandWing(citePts, 1, 0.44, 4, 108, 16, 20.5, 0, 1);
+  addIslandWing(citePts, 1, 0.33, 29, 16, 48, 20.5, 2, 0);
+  addIslandWing(citePts, 1, 0.55, 29, 16, 48, 21.5, 2, 0);
+  [[0.33, 5], [0.55, 5], [0.33, 53], [0.55, 53]].forEach(([tt, lat]) => {
+    addIslandBox(citePts, 1, tt, lat, 18, 22.5, 18, 0.45, matParisWhite);
+    addIslandBox(citePts, 1, tt, lat, 18.8, 5.5, 18.8, 22.95, matSlate);
+  });
+
+  // --- 4. ÎLE SAINT-LOUIS (Rue Saint-Louis-en-l'Île, Hôtels particuliers, Église & Square Barye) ---
+  addIslandBox(stLouisPts, 0, 0.52, 0, 260, 0.25, 11, 0.44, matAvenueAsphalt);
+  addIslandBox(stLouisPts, 1, 0.48, 0, 240, 0.25, 11, 0.44, matAvenueAsphalt);
+  // Quais & rangées d'arbres sur l'Île Saint-Louis
+  addIslandBox(stLouisPts, 0, 0.52, -40, 240, 0.25, 8, 0.44, matAvenueAsphalt);
+  addIslandBox(stLouisPts, 0, 0.52, 40, 240, 0.25, 8, 0.44, matAvenueAsphalt);
+  addIslandBox(stLouisPts, 1, 0.44, -40, 210, 0.25, 8, 0.44, matAvenueAsphalt);
+  addIslandBox(stLouisPts, 1, 0.44, 40, 210, 0.25, 8, 0.44, matAvenueAsphalt);
+
+  [0.24, 0.46, 0.68, 0.88].forEach((tt, bi) => {
+    addIslandWing(stLouisPts, 0, tt, -23, 44, 24, 17.5 + (bi % 2) * 1.4, bi % 4, bi % 3);
+    addIslandWing(stLouisPts, 0, tt, 23, 44, 24, 17.8 + ((bi + 1) % 2) * 1.2, (bi + 1) % 4, (bi + 2) % 3);
+  });
+  [0.14, 0.36, 0.58].forEach((tt, bi) => {
+    addIslandWing(stLouisPts, 1, tt, -22, 42, 23, 17.4 + (bi % 2) * 1.3, (bi + 2) % 4, bi % 3);
+    if (bi !== 1) {
+      addIslandWing(stLouisPts, 1, tt, 22, 42, 23, 17.6, (bi + 3) % 4, (bi + 1) % 3);
+    }
+  });
+  // Église Saint-Louis-en-l'Île & flèche ajourée (42 m)
+  addIslandBox(stLouisPts, 1, 0.36, 22, 34, 18, 16, 0.45, matLimestone);
+  addIslandBox(stLouisPts, 1, 0.36, 22, 35, 5, 14, 18.45, matSlate);
+  addIslandCyl(stLouisPts, 1, 0.33, 22, 0.2, 2.2, 20, 8, 23.0, matLimestone);
+  // Square Barye à la pointe Est de l'Île Saint-Louis
+  addIslandBox(stLouisPts, 1, 0.84, 0, 56, 0.28, 34, 0.44, matParkLawn);
+  for (let s = 0; s < 7; s++) {
+    const t0 = 0.16 + s * 0.12;
+    addIslandTree(stLouisPts, 0, t0, -48);
+    addIslandTree(stLouisPts, 0, t0, 48);
+    if (t0 < 0.90) {
+      addIslandTree(stLouisPts, 1, t0, -45);
+      addIslandTree(stLouisPts, 1, t0, 45);
+    }
+  }
+  [0.78, 0.86, 0.92].forEach((tt) => {
+    addIslandTree(stLouisPts, 1, tt, -12);
+    addIslandTree(stLouisPts, 1, tt, 12);
+  });
+
+  // Pointe Est de l'Île de la Cité : Mémorial des Martyrs de la Déportation & arbres
+  addIslandBox(citePts, 2, 0.84, 0, 46, 0.28, 34, 0.44, matParkLawn);
+  addIslandBox(citePts, 2, 0.92, 0, 18, 1.8, 18, 0.45, matLimestone);
+  [0.68, 0.78, 0.88].forEach((tt) => {
+    addIslandTree(citePts, 2, tt, -22);
+    addIslandTree(citePts, 2, tt, 22);
+  });
+
+  // --- 5. LES 7 PONTS HISTORIQUES DES DEUX ÎLES (Bras Nord & Bras Sud) ---
+  addIslandBridgeSpan(citePts, 1, 0.04, -76, -166, 21, 'stone');   // Pont au Change
+  addIslandBridgeSpan(citePts, 1, 0.04, 76, 166, 21, 'stone');     // Pont Saint-Michel
+  addIslandBridgeSpan(citePts, 1, 0.46, -76, -166, 18, 'stone');   // Pont Notre-Dame
+  addIslandBridgeSpan(stLouisPts, 0, 0.18, -38, -162, 16, 'iron');  // Pont Louis-Philippe
+  addIslandBridgeSpan(stLouisPts, 0, 0.64, -52, -162, 15, 'stone'); // Pont Marie
+  addIslandBridgeSpan(stLouisPts, 1, 0.24, 52, 162, 16, 'stone');   // Pont de la Tournelle
+  // Passerelle / Pont Saint-Louis reliant pointe Est Cité -> pointe Ouest Saint-Louis
+  const pCiteTip = citePts[3];
+  const pStLStart = stLouisPts[0];
+  const stlBridge = new THREE.Mesh(
+    new THREE.BoxGeometry(Math.hypot(pStLStart.x - pCiteTip.x, pStLStart.z - pCiteTip.z) + 28, 1.3, 12),
+    matBridgeStone
+  );
+  stlBridge.position.set((pCiteTip.x + pStLStart.x) * 0.5, 1.55, (pCiteTip.z + pStLStart.z) * 0.5);
+  stlBridge.rotation.y = -Math.atan2(pStLStart.z - pCiteTip.z, pStLStart.x - pCiteTip.x);
+  staticCityLandmarks.add(stlBridge);
+
+  /**
+   * ==========================================================================
+   * URBANISME RADIAL DU QUARTIER DE L'ÉTOILE (r = 146 .. 442 m)
+   * 2 avenues circulaires concentriques + îlots haussmanniens en trapèzes
+   * dans les 12 secteurs + pelouses & contre-allées de l'Avenue Foch
+   * ==========================================================================
+   */
+  const etoileSpokeClearance = [60, 17, 18, 19, 18, 30, 24, 17, 17, 19, 18, 19];
+
+  // 1. Avenues circulaires concentriques suivies sur le relief (R2 = 238 m, R3 = 342 m)
+  const addEtoileRingRoad = (ringR, halfW) => {
+    const segs = 72;
+    const rPos = [];
+    const rUV = [];
+    const rIdx = [];
+    let vc = 0;
+    for (let i = 0; i < segs; i++) {
+      const th0 = concBaseAngle + (i / segs) * Math.PI * 2;
+      const th1 = concBaseAngle + ((i + 1) / segs) * Math.PI * 2;
+      const thM = (th0 + th1) * 0.5;
+      const mx = arcCoords.x + Math.cos(thM) * ringR;
+      const mz = arcCoords.z + Math.sin(thM) * ringR;
+      const ce = toChampsLocal(mx, mz);
+      // Laisse la chaussée & contre-allées des Champs-Élysées intactes (s = 135..1000)
+      if (ce.lz > 85 && Math.abs(ce.lx) < 38) continue;
+
+      const c0 = Math.cos(th0);
+      const s0 = Math.sin(th0);
+      const c1 = Math.cos(th1);
+      const s1 = Math.sin(th1);
+      const pts4 = [
+        [arcCoords.x + c0 * (ringR - halfW), arcCoords.z + s0 * (ringR - halfW)],
+        [arcCoords.x + c0 * (ringR + halfW), arcCoords.z + s0 * (ringR + halfW)],
+        [arcCoords.x + c1 * (ringR - halfW), arcCoords.z + s1 * (ringR - halfW)],
+        [arcCoords.x + c1 * (ringR + halfW), arcCoords.z + s1 * (ringR + halfW)],
+      ];
+      pts4.forEach(([px, pz]) => {
+        rPos.push(px, getParisElevation(px, pz) + 0.036, pz);
+      });
+      rUV.push(0, i, 1, i, 0, i + 1, 1, i + 1);
+      rIdx.push(vc, vc + 2, vc + 1, vc + 1, vc + 2, vc + 3);
+      vc += 4;
+    }
+    if (rIdx.length > 0) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(rPos, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(rUV, 2));
+      geo.setIndex(rIdx);
+      geo.computeVertexNormals();
+      const mesh = new THREE.Mesh(geo, matRiverRoad);
+      mesh.receiveShadow = true;
+      staticCityLandmarks.add(mesh);
+    }
+  };
+  addEtoileRingRoad(238, 6.2);
+  addEtoileRingRoad(342, 6.2);
+
+  // 2. Pelouses & contre-allées arborées de l'Avenue Foch (k = 5, entre Étoile r = 98 m et r = 640 m)
+  {
+    const thFoch = concBaseAngle + 5 * (Math.PI / 6);
+    const fxU = Math.cos(thFoch);
+    const fzU = Math.sin(thFoch);
+    const nx = -fzU;
+    const nz = fxU;
+    const segs = 14;
+    const r0 = 96;
+    const r1 = 620;
+    const lPos = [];
+    const lIdx = [];
+    let vc = 0;
+    [-22.5, 22.5].forEach((lat) => {
+      const halfLawn = 5.2;
+      for (let s = 0; s < segs; s++) {
+        const d0 = r0 + (s / segs) * (r1 - r0);
+        const d1 = r0 + ((s + 1) / segs) * (r1 - r0);
+        const pts4 = [
+          [arcCoords.x + fxU * d0 + nx * (lat - halfLawn), arcCoords.z + fzU * d0 + nz * (lat - halfLawn)],
+          [arcCoords.x + fxU * d0 + nx * (lat + halfLawn), arcCoords.z + fzU * d0 + nz * (lat + halfLawn)],
+          [arcCoords.x + fxU * d1 + nx * (lat - halfLawn), arcCoords.z + fzU * d1 + nz * (lat - halfLawn)],
+          [arcCoords.x + fxU * d1 + nx * (lat + halfLawn), arcCoords.z + fzU * d1 + nz * (lat + halfLawn)],
+        ];
+        pts4.forEach(([px, pz]) => lPos.push(px, getParisElevation(px, pz) + 0.04, pz));
+        lIdx.push(vc, vc + 2, vc + 1, vc + 1, vc + 2, vc + 3);
+        vc += 4;
+      }
+      for (let d = 112; d <= 590; d += 34) {
+        const tx = arcCoords.x + fxU * d + nx * lat;
+        const tz = arcCoords.z + fzU * d + nz * lat;
+        islandTreeCoords.push([tx, tz, getParisElevation(tx, tz)]);
+      }
+    });
+    const fochGeo = new THREE.BufferGeometry();
+    fochGeo.setAttribute('position', new THREE.Float32BufferAttribute(lPos, 3));
+    fochGeo.setIndex(lIdx);
+    fochGeo.computeVertexNormals();
+    const fochMesh = new THREE.Mesh(fochGeo, matParkLawn);
+    fochMesh.receiveShadow = true;
+    staticCityLandmarks.add(fochMesh);
+  }
+
+  // 3. Îlots haussmanniens trapézoïdaux à cours dans les 12 secteurs (3 couronnes : 154..224, 250..328, 354..432 m)
+  const addEtoileWingIfSafe = (wx, wz, ww, wd, h, rotY, stoneSeed, roofSeed) => {
+    const cosR = Math.cos(rotY);
+    const sinR = Math.sin(rotY);
+    const hx = ww * 0.5;
+    const hz = wd * 0.5;
+    let minElev = Infinity;
+    const corners = [
+      [0, 0],
+      [-hx, -hz],
+      [hx, -hz],
+      [-hx, hz],
+      [hx, hz],
+    ];
+    for (let i = 0; i < corners.length; i++) {
+      const [ox, oz] = corners[i];
+      const px = wx + ox * cosR + oz * sinR;
+      const pz = wz - ox * sinR + oz * cosR;
+      const ce = toChampsLocal(px, pz);
+      // Protège l'emprise Champs-Élysées + ses rues transversales s = 135, 310, 485
+      if (ce.lz > 100 && Math.abs(ce.lx) < 60) return;
+      for (let c = 0; c < CHAMPS_CROSS_Z.length; c++) {
+        if (Math.abs(ce.lx) < 108 && Math.abs(ce.lz - CHAMPS_CROSS_Z[c]) < 15.5) return;
+      }
+      if (isNearBoulevard(px, pz, 2.2)) return;
+      minElev = Math.min(minElev, getParisElevation(px, pz));
+    }
+    wingTransforms.push({
+      x: wx,
+      y: minElev - 0.85,
+      z: wz,
+      w: ww,
+      d: wd,
+      h,
+      rotY,
+      stoneSeed,
+      roofSeed,
+    });
+  };
+
+  const etoileBands = [
+    { rIn: 156, rOut: 222, wingD: 13.0 },
+    { rIn: 252, rOut: 326, wingD: 14.5 },
+    { rIn: 356, rOut: 432, wingD: 15.0 },
+  ];
+
+  for (let k = 0; k < 12; k++) {
+    const kNext = (k + 1) % 12;
+    const th0 = concBaseAngle + k * (Math.PI / 6);
+    const th1 = concBaseAngle + (k + 1) * (Math.PI / 6);
+    const midTh = (th0 + th1) * 0.5;
+    const clr0 = etoileSpokeClearance[k];
+    const clr1 = etoileSpokeClearance[kNext];
+
+    const u0x = Math.cos(th0);
+    const u0z = Math.sin(th0);
+    const n0x = -u0z;
+    const n0z = u0x; // Pointe vers l'intérieur du secteur depuis l'avenue k
+
+    const u1x = Math.cos(th1);
+    const u1z = Math.sin(th1);
+    const n1x = u1z;
+    const n1z = -u1x; // Pointe vers l'intérieur du secteur depuis l'avenue k+1
+
+    etoileBands.forEach((band, bIdx) => {
+      const rMid = (band.rIn + band.rOut) * 0.5;
+      const chordSpan = rMid * 2 * Math.sin(Math.PI / 12);
+      const clearSpan = chordSpan - clr0 - clr1;
+      const radialLen = band.rOut - band.rIn;
+      const stoneSeed = (k * 3 + bIdx) % 4;
+      const roofSeed = (k + bIdx * 2) % 4;
+      const hBase = 19.6 + ((k + bIdx) % 3) * 1.1;
+
+      if (clearSpan < 14) return;
+
+      // Aile alignée côté avenue k (quand la largeur entre avenues permet deux rives ou au moins une aile dédiée)
+      const sideD = Math.min(band.wingD, clearSpan * 0.42);
+      const lat0 = clr0 + sideD * 0.5;
+      addEtoileWingIfSafe(
+        arcCoords.x + u0x * rMid + n0x * lat0,
+        arcCoords.z + u0z * rMid + n0z * lat0,
+        radialLen - 4,
+        sideD,
+        hBase,
+        -th0,
+        stoneSeed,
+        roofSeed
+      );
+
+      // Aile alignée côté avenue k+1 (en symétrie si suffisamment large)
+      if (clearSpan >= 30) {
+        const lat1 = clr1 + sideD * 0.5;
+        addEtoileWingIfSafe(
+          arcCoords.x + u1x * rMid + n1x * lat1,
+          arcCoords.z + u1z * rMid + n1z * lat1,
+          radialLen - 4,
+          sideD,
+          hBase + 0.6,
+          -th1,
+          (stoneSeed + 1) % 4,
+          roofSeed
+        );
+      }
+
+      // Ailes transversales avant/arrière bordant les boulevards circulaires (ferment la cour intérieure)
+      if (clearSpan >= 42) {
+        const capW = Math.min(clearSpan - sideD * 1.85, rMid * 0.34);
+        const capD = Math.min(13.5, radialLen * 0.28);
+        const cU = Math.cos(midTh);
+        const cS = Math.sin(midTh);
+        const offTan = (clr0 - clr1) * 0.32;
+        const tNx = -cS;
+        const tNz = cU;
+        if (capW >= 14) {
+          addEtoileWingIfSafe(
+            arcCoords.x + cU * (band.rIn + capD * 0.5) + tNx * offTan,
+            arcCoords.z + cS * (band.rIn + capD * 0.5) + tNz * offTan,
+            capW,
+            capD,
+            hBase + 0.3,
+            -midTh + Math.PI * 0.5,
+            (stoneSeed + 2) % 4,
+            roofSeed
+          );
+          addEtoileWingIfSafe(
+            arcCoords.x + cU * (band.rOut - capD * 0.5) + tNx * offTan,
+            arcCoords.z + cS * (band.rOut - capD * 0.5) + tNz * offTan,
+            capW,
+            capD,
+            hBase - 0.3,
+            -midTh + Math.PI * 0.5,
+            stoneSeed,
+            (roofSeed + 1) % 4
+          );
+        }
+        // Arbres dans la cour intérieure de l'îlot & bord de boulevard circulaire
+        const treeX = arcCoords.x + cU * rMid + tNx * offTan;
+        const treeZ = arcCoords.z + cS * rMid + tNz * offTan;
+        islandTreeCoords.push([treeX, treeZ, getParisElevation(treeX, treeZ)]);
+      }
+    });
   }
 
   /**
@@ -1535,6 +2797,7 @@ export function buildParisWorld(scene) {
     const { dist: dS, hw: hwS } = getSeineDistAndHalfWidth(mx, mz);
     if (dS < hwS + 11) return false;
     if (isNearBoulevard(mx, mz, -5)) return false;
+    if (isInsideLouvre(mx, mz, 6) || isInsideOrsay(mx, mz, 5)) return false;
 
     // Intérieur des quartiers détaillés & parcs (s'arrête net sur les rues bordantes sans trou ni intrusion)
     if (mx > -136 && mx < 134 && mz > -104 && mz < 136) return false;
@@ -1545,7 +2808,31 @@ export function buildParisWorld(scene) {
     const elx = edx * cosEI + edz * sinEI;
     const elz = -edx * sinEI + edz * cosEI;
     if (Math.abs(elx) < 204 && elz > -635 && elz < 880) return false;
-    if (Math.hypot(mx - arcCoords.x, mz - arcCoords.z) < 128) return false;
+    if (Math.hypot(mx - arcCoords.x, mz - arcCoords.z) < 442) return false;
+
+    const { lx: glx, lz: glz } = toGarnierLocal(mx, mz);
+    if (Math.abs(glx) < 98 && glz > -104 && glz < 222) return false;
+
+    const { lx: ndx, lz: ndz } = toNotreDameLocal(mx, mz);
+    if (ndx > -168 && ndx < 155 && Math.abs(ndz) < 82) return false;
+
+    const slx = mx - (-139);
+    const slz = mz - (-2591);
+    if (slx > -148 && slx < 134 && slz > -74 && slz < 292) return false;
+
+    const pdx = mx - 102;
+    const pdz = mz - 1913;
+    const plx = pdx * 0.9656 - pdz * (-0.2600);
+    const plz = pdx * (-0.2600) + pdz * 0.9656;
+    if (plx > -126 && plx < 122 && Math.abs(plz) < 98) return false;
+
+    if (distanceToPolyline(mx, mz, canalPts) < 28) return false;
+    for (let i = 0; i < cityParks.length; i++) {
+      const pk = cityParks[i];
+      const dx = (mx - pk.x) / (pk.rx + 8);
+      const dz = (mz - pk.z) / (pk.rz + 8);
+      if (dx * dx + dz * dz < 1.0) return false;
+    }
 
     const { lx, lz } = toChampsLocal(mx, mz);
     if (lz >= 130 && lz <= 1105 && Math.abs(lx) < 52) return false;
@@ -1567,7 +2854,7 @@ export function buildParisWorld(scene) {
     }
     for (let i = 0; i < MONUMENTS.length; i++) {
       const m = MONUMENTS[i];
-      if (m.id === 'tour-eiffel' || m.id === 'saint-eustache' || m.id === 'arc-de-triomphe') continue;
+      if (m.id === 'tour-eiffel' || m.id === 'saint-eustache' || m.id === 'arc-de-triomphe' || m.id === 'palais-garnier' || m.id === 'notre-dame' || m.id === 'sacre-coeur' || m.id === 'pantheon') continue;
       if (Math.hypot(mx - m.pos.x, mz - m.pos.z) < Math.max(36, m.exclusionRadius - 30)) return false;
     }
     return true;
@@ -1584,7 +2871,7 @@ export function buildParisWorld(scene) {
     const jIdx = [];
     let jVerts = 0;
 
-    const halfRoad = 6.2;
+    const halfRoad = 4.9;
     const subLen = STEP / 4; // 26 m
     const nodeMask = new Map(); // nodeKey -> bitmask (1 = N/S vertical, 2 = E/O horizontal)
     const markNode = (nx, nz, bit) => {
@@ -1707,16 +2994,24 @@ export function buildParisWorld(scene) {
   roofInstanced.receiveShadow = false;
 
   const stonePalette = [
-    new THREE.Color(0xf6efe2),
-    new THREE.Color(0xede2ce),
-    new THREE.Color(0xfaf4e8),
-    new THREE.Color(0xe4d7c1),
+    new THREE.Color(0xf6efe2), // Pierre de taille lutétienne claire
+    new THREE.Color(0xede0c8), // Pierre blonde chaude Haussmann
+    new THREE.Color(0xfaf4e8), // Calcaire ivoire lumineux
+    new THREE.Color(0xdfd3be), // Pierre grise patinée
+    new THREE.Color(0xead4b8), // Enduit faubourg ocre-sable
+    new THREE.Color(0xdcc2b2), // Brique & pierre rosée (10e/11e/18e)
+    new THREE.Color(0xe6dfd3), // Pierre claire moderne
+    new THREE.Color(0xd6c7ae), // Pierre ancienne du Marais
   ];
   const roofPalette = [
-    new THREE.Color(0x7c8d9e),
-    new THREE.Color(0x6c7c8d),
-    new THREE.Color(0x8899aa),
-    new THREE.Color(0x647282),
+    new THREE.Color(0x7c8d9e), // Zinc gris-bleu classique
+    new THREE.Color(0x5f6d7d), // Ardoise d'Angers sombre
+    new THREE.Color(0x95a4b2), // Zinc clair argenté
+    new THREE.Color(0x4b5664), // Ardoise anthracite
+    new THREE.Color(0x8e5642), // Tuile brun-rouge faubourg / Montmartre
+    new THREE.Color(0x6b7f7c), // Zinc patiné gris-vert
+    new THREE.Color(0xa6b2bc), // Zinc perle lumineux
+    new THREE.Color(0x705c54), // Tuile brune ancienne
   ];
 
   const dummy = new THREE.Object3D();
@@ -1746,29 +3041,34 @@ export function buildParisWorld(scene) {
   // --- ARBRES DES GRANDS BOULEVARDS & PARCS VIA 2 InstancedMesh (2 DRAW CALLS) ---
   const filteredTrees = cityTreeCoords.filter(([tx, tz]) => {
     if (isInsideDetailedDistrict(tx, tz)) return false;
+    if (isInsideLouvre(tx, tz, 4) || isInsideOrsay(tx, tz, 4)) return false;
     if (distanceToPolyline(tx, tz, SEINE_POINTS) < 82) return false;
     if (isNearBoulevard(tx, tz, -0.8)) return false;
     if (Math.hypot(tx - invPos.x, tz - invPos.z) < 92) return false;
     for (let i = 0; i < MONUMENTS.length; i++) {
       const m = MONUMENTS[i];
-      if (m.id === 'tour-eiffel' || m.id === 'saint-eustache') continue;
+      if (m.id === 'tour-eiffel' || m.id === 'saint-eustache' || m.id === 'arc-de-triomphe' || m.id === 'palais-garnier' || m.id === 'notre-dame' || m.id === 'sacre-coeur' || m.id === 'pantheon') continue;
       if (Math.hypot(tx - m.pos.x, tz - m.pos.z) < 62) return false;
     }
     return true;
   });
 
-  if (filteredTrees.length > 0) {
+  const allTreePlacements = [
+    ...filteredTrees.map(([tx, tz]) => [tx, tz, getParisElevation(tx, tz)]),
+    ...islandTreeCoords,
+  ];
+
+  if (allTreePlacements.length > 0) {
     const matCityTrunk = new THREE.MeshStandardMaterial({ color: 0x534030, roughness: 0.92 });
     const matCityLeaf = new THREE.MeshStandardMaterial({ color: 0x527a3f, roughness: 0.85 });
-    const cityTrunksInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.24, 0.38, 4.6, 6), matCityTrunk, filteredTrees.length);
-    const cityCrownsInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(3.0, 1), matCityLeaf, filteredTrees.length);
+    const cityTrunksInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.24, 0.38, 4.6, 6), matCityTrunk, allTreePlacements.length);
+    const cityCrownsInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(3.0, 1), matCityLeaf, allTreePlacements.length);
     cityTrunksInst.castShadow = false;
     cityCrownsInst.castShadow = false;
     cityCrownsInst.receiveShadow = true;
 
     const leafTint = new THREE.Color();
-    filteredTrees.forEach(([tx, tz], idx) => {
-      const ty = getParisElevation(tx, tz);
+    allTreePlacements.forEach(([tx, tz, ty], idx) => {
       const sc = 0.88 + ((idx * 17) % 7) * 0.06;
       dummy.rotation.set(0, (idx * 1.1) % (Math.PI * 2), 0);
       dummy.position.set(tx, ty + 2.2 * sc, tz);
@@ -2153,6 +3453,7 @@ export function buildParisWorld(scene) {
 
     matBoatCabin.emissiveIntensity = 0.2 + nightFactor * 1.8;
     matHaussLOD.emissiveIntensity = Math.max(0, (nightFactor - 0.14) / 0.86) * 0.95;
+    matMontparnasse.emissiveIntensity = 0.06 + Math.max(0, (nightFactor - 0.12) / 0.88) * 1.15;
 
     for (let i = 0; i < boats.length; i++) {
       const bt = boats[i];

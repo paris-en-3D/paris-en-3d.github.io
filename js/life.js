@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { mergeStaticGroupByMaterial } from './perf-manager.js';
 import { getParisElevation } from './paris-data.js';
 import { champsLocalToWorld } from './monuments/champs-elysees.js';
+import { GARNIER_WORLD_POS, GARNIER_ROT_Y } from './monuments/palais-garnier.js';
+import { NOTRE_DAME_WORLD_POS, NOTRE_DAME_ROT_Y } from './monuments/notre-dame.js';
+import { SACRE_COEUR_WORLD_POS, SACRE_COEUR_ROT_Y } from './monuments/sacre-coeur.js';
+import { PANTHEON_WORLD_POS, PANTHEON_ROT_Y } from './monuments/pantheon.js';
 
 /**
  * ============================================================================
@@ -33,6 +37,30 @@ export function createLivingWorld(scene) {
   arcLifeGroup.position.set(-3658, 18, -1156);
   arcLifeGroup.rotation.y = Math.PI * 0.5 - Math.atan2(911, 1917);
   lifeRoot.add(arcLifeGroup);
+
+  const garnierLifeGroup = new THREE.Group();
+  garnierLifeGroup.position.copy(GARNIER_WORLD_POS);
+  garnierLifeGroup.rotation.y = GARNIER_ROT_Y;
+  garnierLifeGroup.visible = false;
+  lifeRoot.add(garnierLifeGroup);
+
+  const notreDameLifeGroup = new THREE.Group();
+  notreDameLifeGroup.position.copy(NOTRE_DAME_WORLD_POS);
+  notreDameLifeGroup.rotation.y = NOTRE_DAME_ROT_Y;
+  notreDameLifeGroup.visible = false;
+  lifeRoot.add(notreDameLifeGroup);
+
+  const sacreCoeurLifeGroup = new THREE.Group();
+  sacreCoeurLifeGroup.position.copy(SACRE_COEUR_WORLD_POS);
+  sacreCoeurLifeGroup.rotation.y = SACRE_COEUR_ROT_Y;
+  sacreCoeurLifeGroup.visible = false;
+  lifeRoot.add(sacreCoeurLifeGroup);
+
+  const pantheonLifeGroup = new THREE.Group();
+  pantheonLifeGroup.position.copy(PANTHEON_WORLD_POS);
+  pantheonLifeGroup.rotation.y = PANTHEON_ROT_Y;
+  pantheonLifeGroup.visible = false;
+  lifeRoot.add(pantheonLifeGroup);
 
   // Palettes couleurs (utilisées via InstancedMesh.setColorAt -> 1 seul matériau partagé !)
   const skinColors = [0xefd0b4, 0xd9a882, 0x8d5b3e];
@@ -713,6 +741,135 @@ export function createLivingWorld(scene) {
     ],
   });
 
+  // --- SECTEUR 4 : PALAIS GARNIER & PLACE DE L'OPÉRA (-980, 0, -956) ---
+  const garnierStairHeight = (_x, z) => {
+    if (z <= 53 && z >= 40.5) return 1.4 + ((53.0 - z) / 12.5) * 4.2;
+    if (z < 40.5 && z >= 37.2) return 5.6;
+    if (z < 37.5 && z >= 23.5) return 5.6 + ((37.5 - z) / 13.5) * 4.9;
+    return z > 82 ? 0.22 : 1.4;
+  };
+  const updateGarnierLife = createSectorLife({
+    parentGroup: garnierLifeGroup,
+    pedRoutes: [
+      // Flâneurs sur le Parvis Place Charles-Garnier devant les arcades
+      { y: 0.23, speed: 1.35, pts: [[-34, 94], [34, 94], [34, 118], [-34, 118]] },
+      { y: 0.23, speed: 1.42, pts: [[28, 114], [-28, 114], [-28, 96], [28, 96]] },
+      { y: 0.23, speed: 1.28, pts: [[-14, 91], [14, 91], [14, 121], [-14, 121]] },
+      // Clients et promeneurs le long de la terrasse du Café de la Paix (Ouest)
+      { y: 0.22, speed: 1.25, pts: [[-55, 96], [-55, 145], [-92, 145], [-92, 138], [-58, 138], [-58, 96]] },
+      { y: 0.22, speed: 1.32, pts: [[-56, 142], [-56, 98], [-54, 98], [-54, 142]] },
+      // Visiteurs autour des bouches du Métro Opéra (Place de l'Opéra)
+      { y: 0.24, speed: 1.2, pts: [[-10, 132], [10, 132], [10, 144], [-10, 144]] },
+      { y: 0.24, speed: 1.25, pts: [[8, 189], [-8, 189], [-8, 199], [8, 199]] },
+      // Spectateurs montant et descendant le Grand Escalier d'Honneur
+      { y: 1.4, yFn: garnierStairHeight, speed: 0.95, pts: [[-2.4, 54], [-2.4, 38.5], [-9.2, 24.5], [-6.2, 24.5], [-1.2, 38.5], [-1.2, 54]] },
+      { y: 1.4, yFn: garnierStairHeight, speed: 1.0, pts: [[2.2, 25], [8.8, 25], [8.8, 38.5], [2.2, 53.5], [1.0, 53.5], [6.5, 38.5], [6.5, 25]] },
+      // Promeneurs élégants dans le Grand Foyer Doré (y = 10,52 m)
+      { y: 10.52, speed: 0.88, pts: [[-22, 66], [22, 66], [22, 71.5], [-22, 71.5]] },
+      { y: 10.52, speed: 0.92, pts: [[18, 70.5], [-18, 70.5], [-18, 66.5], [18, 66.5]] },
+    ],
+    vehicleSpecs: [
+      // Boulevard des Capucines -> Boulevard des Italiens traversant la Place de l'Opéra (lz = +155..+181)
+      { type: 'bus',   axis: 'x', fixed: 156.5, y: 0.09, dir: 1,  min: -98, max: 98, start: -52, speed: 7.4 },
+      { type: 'taxi',  axis: 'x', fixed: 162.5, y: 0.09, dir: 1,  min: -98, max: 98, start: 18,  speed: 10.4, color: 0x1c222b },
+      { type: 'sedan', axis: 'x', fixed: 170.5, y: 0.09, dir: -1, min: -98, max: 98, start: 68,  speed: 10.8, color: 0x385075 },
+      { type: 'bus',   axis: 'x', fixed: 177.5, y: 0.09, dir: -1, min: -98, max: 98, start: -18, speed: 7.2 },
+      { type: 'velib', axis: 'x', fixed: 152.5, y: 0.09, dir: 1,  min: -95, max: 95, start: -80, speed: 4.8 },
+      // Amorce de l'Avenue de l'Opéra (de part et d'autre de l'îlot Sud Métro Opéra à |lx| = 15 m)
+      { type: 'taxi',  axis: 'z', fixed: -15.5, y: 0.09, dir: 1,  min: 155, max: 224, start: 172, speed: 9.8, color: 0x263242 },
+      { type: 'sedan', axis: 'z', fixed: 15.5,  y: 0.09, dir: -1, min: 155, max: 224, start: 208, speed: 10.2, color: 0x6f242c },
+    ],
+    birdFlocks: [
+      { cx: 0, cz: -8, rx: 46, rz: 42, baseY: 57, count: 6, speed: 0.22, dir: 1 },
+      { cx: 0, cz: 62, rx: 52, rz: 36, baseY: 42, count: 5, speed: 0.25, dir: -1 },
+    ],
+  });
+
+  // --- SECTEUR 5 : CATHÉDRALE NOTRE-DAME DE PARIS & ÎLE DE LA CITÉ (+358, +0.45, +1156) ---
+  const updateNotreDameLife = createSectorLife({
+    parentGroup: notreDameLifeGroup,
+    pedRoutes: [
+      // Visiteurs autour du Point Zéro & du Parvis devant les Portails
+      { y: 0.14, speed: 1.25, pts: [[-118, -16], [-72, -16], [-72, 16], [-118, 16]] },
+      { y: 0.14, speed: 1.32, pts: [[-68, 22], [-104, 22], [-104, -22], [-68, -22]] },
+      { y: 0.14, speed: 1.18, pts: [[-140, -10], [-98, -10], [-98, 12], [-140, 12]] },
+      // Visiteurs entrant par le Portail central dans la Grande Nef & Bas-côtés
+      { y: 0.22, speed: 0.92, pts: [[-54, -1.5], [2, -1.5], [2, 1.5], [-54, 1.5]] },
+      { y: 0.22, speed: 0.88, pts: [[-45, -10.2], [26, -10.2], [26, -15.8], [-45, -15.8]] },
+      { y: 0.22, speed: 0.90, pts: [[26, 15.8], [-45, 15.8], [-45, 10.2], [26, 10.2]] },
+      // Promeneurs au Square Jean-XXIII & Fontaines / Bouquinistes
+      { y: 0.13, speed: 1.15, pts: [[68, -12], [116, -12], [116, 12], [68, 12]] },
+      { y: 0.13, speed: 1.22, pts: [[-105, 68], [62, 68], [62, 62], [-105, 62]] },
+    ],
+    vehicleSpecs: [
+      // Voitures / taxis traversant Petit-Pont & Pont d'Arcole (lx = -132)
+      { type: 'taxi',  axis: 'z', fixed: -135.5, y: 1.85, dir: 1,  min: 74,   max: 152, start: 85,  speed: 8.6, color: 0x1c222b },
+      { type: 'sedan', axis: 'z', fixed: -128.5, y: 1.85, dir: -1, min: 74,   max: 152, start: 132, speed: 9.2, color: 0x385075 },
+      { type: 'bus',   axis: 'z', fixed: -135.0, y: 1.85, dir: 1,  min: -152, max: -74, start: -135, speed: 6.8 },
+      { type: 'velib', axis: 'x', fixed: 31.5,   y: 0.12, dir: 1,  min: -140, max: 115, start: -60, speed: 4.9 },
+    ],
+    birdFlocks: [
+      { cx: 11,  cz: 0, rx: 44, rz: 38, baseY: 78, count: 7, speed: 0.23, dir: 1 },
+      { cx: -56, cz: 0, rx: 38, rz: 42, baseY: 56, count: 6, speed: 0.26, dir: -1 },
+    ],
+  });
+
+  // --- SECTEUR 6 : BASILIQUE DU SACRÉ-CŒUR & VILLAGE DE MONTMARTRE (-139, +90, -2591) ---
+  const scSlopeY = (lx, lz) => getParisElevation(SACRE_COEUR_WORLD_POS.x + lx, SACRE_COEUR_WORLD_POS.z + lz) - SACRE_COEUR_WORLD_POS.y + 1.85;
+  const updateSacreCoeurLife = createSectorLife({
+    parentGroup: sacreCoeurLifeGroup,
+    pedRoutes: [
+      // Flâneurs & photographes sur le grand Parvis panoramique devant le Triple Portique
+      { y: 0.1, speed: 1.18, pts: [[-34, 52], [34, 52], [34, 68], [-34, 68]] },
+      { y: 0.1, speed: 1.24, pts: [[26, 65], [-26, 65], [-26, 54], [26, 54]] },
+      { y: 0.1, speed: 1.05, pts: [[-14, 50], [14, 50], [14, 69], [-14, 69]] },
+      // Visiteurs dans la Grande Nef vers la Mosaïque d'Or du Christ
+      { y: 2.53, speed: 0.85, pts: [[-1.6, 26], [-1.6, -12], [1.6, -12], [1.6, 26]] },
+      { y: 2.53, speed: 0.82, pts: [[-10.5, 22], [-10.5, -6], [-12.5, -6], [-12.5, 22]] },
+      // Promeneurs sur les terrasses du Square Louise-Michel
+      { y: 0, yFn: scSlopeY, speed: 1.08, pts: [[-24, 96], [24, 96], [24, 102], [-24, 102]] },
+      { y: 0, yFn: scSlopeY, speed: 1.12, pts: [[-28, 134], [28, 134], [28, 140], [-28, 140]] },
+      { y: 0, yFn: (lx, lz) => getParisElevation(SACRE_COEUR_WORLD_POS.x + lx, SACRE_COEUR_WORLD_POS.z + lz) - SACRE_COEUR_WORLD_POS.y + 1.55, speed: 1.2, pts: [[-36, 214], [12, 214], [12, 224], [-36, 224]] },
+      // Visiteurs & artistes déambulant sur la Place du Tertre (très animée !)
+      { y: 0.1, speed: 1.05, count: 4, pts: [[-122, 0.5], [-96, 0.5], [-96, 27.5], [-122, 27.5]] },
+      { y: 0.1, speed: 0.98, count: 4, pts: [[-98, 26.5], [-121, 26.5], [-121, 1.5], [-98, 1.5]] },
+      { y: 0.28, speed: 0.85, count: 4, pts: [[-116, 7.5], [-104, 7.5], [-104, 20.5], [-116, 20.5]] },
+    ],
+    vehicleSpecs: [
+      // Taxis & voitures passant en contrebas sur la Place Saint-Pierre / Rue Tardieu (lz = +232)
+      { type: 'taxi',  axis: 'x', fixed: 230, y: getParisElevation(-139, -2591 + 230) - 90 + 1.48, dir: 1,  min: -60, max: 60, start: -42, speed: 7.4, color: 0x1c222b },
+      { type: 'sedan', axis: 'x', fixed: 234, y: getParisElevation(-139, -2591 + 234) - 90 + 1.48, dir: -1, min: -60, max: 60, start: 35,  speed: 8.1, color: 0x6f242c },
+    ],
+    birdFlocks: [
+      { cx: 0, cz: 0,  rx: 46, rz: 48, baseY: 84, count: 8, speed: 0.22, dir: 1 },
+      { cx: 0, cz: 46, rx: 54, rz: 36, baseY: 54, count: 6, speed: 0.25, dir: -1 },
+    ],
+  });
+
+  // --- SECTEUR 7 : LE PANTHÉON & PLACE DU PANTHÉON (+102, +26, +1913) ---
+  const updatePantheonLife = createSectorLife({
+    parentGroup: pantheonLifeGroup,
+    pedRoutes: [
+      // Étudiants & visiteurs sur la Place du Panthéon devant le Péristyle
+      { y: 0.06, speed: 1.18, count: 3, pts: [[-66, -24], [-66, 24], [-86, 24], [-86, -24]] },
+      { y: 0.06, speed: 1.12, count: 3, pts: [[-105, -16], [-64, -16], [-64, -36], [-105, -36]] },
+      { y: 0.06, speed: 1.10, count: 3, pts: [[-105, 16], [-64, 16], [-64, 36], [-105, 36]] },
+      // Visiteurs intérieurs admirant le Pendule de Foucault & les fresques de Puvis de Chavannes !
+      { y: 2.42, speed: 0.78, count: 3, pts: [[-28, -5.5], [-8, -8.5], [14, -8.5], [14, 8.5], [-8, 8.5], [-28, 5.5]] },
+      { y: 2.42, speed: 0.72, count: 2, pts: [[-8.5, -24], [8.5, -24], [8.5, -9], [-8.5, -9]] },
+      { y: 2.42, speed: 0.72, count: 2, pts: [[-8.5, 9], [8.5, 9], [8.5, 24], [-8.5, 24]] },
+    ],
+    vehicleSpecs: [
+      { type: 'bus',   axis: 'x', fixed: -56, y: 0.14, dir: 1,  min: -62, max: 58, start: -40, speed: 6.4 },
+      { type: 'taxi',  axis: 'x', fixed: +56, y: 0.14, dir: -1, min: -62, max: 58, start: 34,  speed: 7.8, color: 0x1c222b },
+      { type: 'sedan', axis: 'z', fixed: +66, y: 0.14, dir: 1,  min: -52, max: 52, start: -30, speed: 7.2, color: 0x385075 },
+    ],
+    birdFlocks: [
+      { cx: 0, cz: 0, rx: 40, rz: 40, baseY: 86, count: 7, speed: 0.21, dir: 1 },
+      { cx: -52, cz: 0, rx: 32, rz: 36, baseY: 46, count: 5, speed: 0.25, dir: -1 },
+    ],
+  });
+
   let elapsed = 0;
 
   function update(dt, nightFactor = 0.1, activeMonumentId = 'saint-eustache') {
@@ -730,13 +887,27 @@ export function createLivingWorld(scene) {
 
     if (!lifeRoot.visible) return;
 
-    eustacheLifeGroup.visible = activeMonumentId !== 'tour-eiffel' && activeMonumentId !== 'arc-de-triomphe';
+    eustacheLifeGroup.visible =
+      activeMonumentId !== 'tour-eiffel' &&
+      activeMonumentId !== 'arc-de-triomphe' &&
+      activeMonumentId !== 'palais-garnier' &&
+      activeMonumentId !== 'notre-dame' &&
+      activeMonumentId !== 'sacre-coeur' &&
+      activeMonumentId !== 'pantheon';
     eiffelLifeGroup.visible = activeMonumentId === 'tour-eiffel';
     arcLifeGroup.visible = activeMonumentId === 'arc-de-triomphe';
+    garnierLifeGroup.visible = activeMonumentId === 'palais-garnier';
+    notreDameLifeGroup.visible = activeMonumentId === 'notre-dame';
+    sacreCoeurLifeGroup.visible = activeMonumentId === 'sacre-coeur';
+    pantheonLifeGroup.visible = activeMonumentId === 'pantheon';
 
     if (eustacheLifeGroup.visible) updateEustacheLife(clampedDt, elapsed);
     if (eiffelLifeGroup.visible) updateEiffelLife(clampedDt, elapsed);
     if (arcLifeGroup.visible) updateArcLife(clampedDt, elapsed);
+    if (garnierLifeGroup.visible) updateGarnierLife(clampedDt, elapsed);
+    if (notreDameLifeGroup.visible) updateNotreDameLife(clampedDt, elapsed);
+    if (sacreCoeurLifeGroup.visible) updateSacreCoeurLife(clampedDt, elapsed);
+    if (pantheonLifeGroup.visible) updatePantheonLife(clampedDt, elapsed);
   }
 
   return {

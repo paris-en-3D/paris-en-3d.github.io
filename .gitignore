@@ -1,4 +1,7 @@
 scripts/
+.photo-cache/
+imports/
+selecteur-photos.html
 __pycache__/
 *.pyc
 *.log

@@ -186,7 +186,7 @@ export function buildSaintEustacheMonument(scene) {
     currentCamDist = camDist;
     built.root.visible = true;
     built.exteriorGroup.visible = true;
-    built.envGroup.visible = true;
+    built.envGroup.visible = level < 2;
     built.interiorDetailGroup.visible = level === 0;
     if (built.envGroup.userData.microPropsGroup) {
       built.envGroup.userData.microPropsGroup.visible = level === 0;

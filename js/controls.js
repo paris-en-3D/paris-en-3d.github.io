@@ -3,6 +3,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { MONUMENTS, SEINE_POINTS, distanceToPolyline, getParisElevation } from './paris-data.js';
 import { worldToChampsLocal } from './monuments/champs-elysees.js';
+import { worldToGarnierLocal } from './monuments/palais-garnier.js';
+import { worldToNotreDameLocal } from './monuments/notre-dame.js';
+import { worldToSacreCoeurLocal, SACRE_COEUR_WORLD_POS } from './monuments/sacre-coeur.js';
+import { worldToPantheonLocal, PANTHEON_WORLD_POS } from './monuments/pantheon.js';
 
 /**
  * ============================================================================
@@ -26,7 +30,7 @@ export function createCameraController({
   const orbit = new OrbitControls(camera, domElement);
   orbit.enableDamping = true;
   orbit.dampingFactor = 0.065;
-  orbit.maxPolarAngle = Math.PI * 0.488;
+  orbit.maxPolarAngle = Math.PI * 0.90;
   orbit.minDistance = 8;
   orbit.maxDistance = 1400;
   orbit.target.set(-10, 16, 0);
@@ -112,6 +116,28 @@ export function createCameraController({
       const lz = THREE.MathUtils.clamp(dx * ARC_SIN + dz * ARC_COS, -8.6, 8.6);
       pos.x = ARC_WORLD_X + lx * ARC_COS + lz * ARC_SIN;
       pos.z = ARC_WORLD_Z - lx * ARC_SIN + lz * ARC_COS;
+      return;
+    }
+
+    // Garde-fou circulaire du Belvédère du Grand Dôme du Sacré-Cœur (ly = 71,3 m)
+    if (context.monumentId === 'sacre-coeur' && pos.y > 152) {
+      const dx = pos.x - SACRE_COEUR_WORLD_POS.x;
+      const dz = pos.z - SACRE_COEUR_WORLD_POS.z;
+      const r = Math.hypot(dx, dz) || 0.001;
+      const clampedR = THREE.MathUtils.clamp(r, 3.6, 4.75);
+      pos.x = SACRE_COEUR_WORLD_POS.x + (dx / r) * clampedR;
+      pos.z = SACRE_COEUR_WORLD_POS.z + (dz / r) * clampedR;
+      return;
+    }
+
+    // Garde-fou circulaire de la Colonnade Panoramique du Dôme du Panthéon (ly = 51,5 m)
+    if (context.monumentId === 'pantheon' && pos.y > PANTHEON_WORLD_POS.y + 42) {
+      const dx = pos.x - PANTHEON_WORLD_POS.x;
+      const dz = pos.z - PANTHEON_WORLD_POS.z;
+      const r = Math.hypot(dx, dz) || 0.001;
+      const clampedR = THREE.MathUtils.clamp(r, 12.9, 15.6);
+      pos.x = PANTHEON_WORLD_POS.x + (dx / r) * clampedR;
+      pos.z = PANTHEON_WORLD_POS.z + (dz / r) * clampedR;
       return;
     }
 
@@ -356,6 +382,62 @@ export function createCameraController({
       return 'Place de la Concorde • Obélisque';
     }
 
+    // 2d. Secteur Palais Garnier & Place de l'Opéra (-980, 0, -956)
+    const pg = worldToGarnierLocal(x, z);
+    if (Math.abs(pg.lx) < 105 && pg.lz > -105 && pg.lz < 225) {
+      if (Math.abs(pg.lx) < 30 && pg.lz > -26 && pg.lz < 82 && y < 32) {
+        if (pg.lz >= 61 && y > 8.5) return 'Palais Garnier • Le Grand Foyer Doré';
+        if (pg.lz < 18) return 'Palais Garnier • Grande Salle & Plafond Chagall';
+        if (pg.lz < 55) return 'Palais Garnier • Grand Escalier d’Honneur';
+        return 'Palais Garnier • Vestibule & Bassin de la Pythie';
+      }
+      if (pg.lz > 132) return 'Place de l’Opéra • Café de la Paix';
+      return 'Parvis du Palais Garnier • Opéra';
+    }
+
+    // 2e. Secteur Cathédrale Notre-Dame & Île de la Cité (+358, 0.45, +1156)
+    const nd = worldToNotreDameLocal(x, z);
+    if (nd.lx > -160 && nd.lx < 145 && Math.abs(nd.lz) < 82) {
+      if (y < 36 && ((nd.lx >= -58 && nd.lx <= 44 && Math.abs(nd.lz) < 20) || (nd.lx >= 3 && nd.lx <= 19 && Math.abs(nd.lz) < 25))) {
+        if (nd.lx > 20) return 'Notre-Dame • Chœur & Pietà';
+        if (nd.lx >= 3) return 'Notre-Dame • Croisée & Grandes Rosaces';
+        return 'Notre-Dame • Grande Nef Gothique';
+      }
+      if (nd.lx > 58) return 'Square Jean-XXIII • Chevet';
+      return 'Parvis Notre-Dame • Point Zéro';
+    }
+
+    // 2f. Secteur Basilique du Sacré-Cœur & Village de Montmartre (-139, +90, -2591)
+    const sc = worldToSacreCoeurLocal(x, z);
+    if (sc.lx > -165 && sc.lx < 115 && sc.lz > -105 && sc.lz < 255) {
+      if (y > 148 && Math.hypot(sc.lx, sc.lz) < 28) return 'Sacré-Cœur • Belvédère du Grand Dôme (83 m)';
+      if (y < 145 && ((Math.abs(sc.lx) < 16.5 && sc.lz > -36 && sc.lz < 33) || (Math.abs(sc.lx) < 25 && Math.abs(sc.lz) < 12.5))) {
+        if (sc.lz < -12) return 'Sacré-Cœur • Chœur & Mosaïque d’Or (475 m²)';
+        if (sc.lz > 18) return 'Sacré-Cœur • Nef & Grand Orgue Cavaillé-Coll';
+        return 'Sacré-Cœur • Croisée sous la Coupole (55 m)';
+      }
+      if (sc.lx < -76 && sc.lz > -30 && sc.lz < 52) return 'Montmartre • Place du Tertre & Saint-Pierre';
+      if (sc.lx < -44 && sc.lz >= 62 && sc.lz <= 222) return 'Funiculaire de Montmartre & Rue Foyatier';
+      if (sc.lz > 74) return 'Square Louise-Michel • Carrousel de Montmartre';
+      if (sc.lz < -38) return 'Sacré-Cœur • Campanile de la Savoyarde (84 m)';
+      return 'Parvis du Sacré-Cœur • Butte Montmartre';
+    }
+
+    // 2g. Secteur Le Panthéon & Place du Panthéon (+102, +26, +1913)
+    const pan = worldToPantheonLocal(x, z);
+    if (pan.lx > -135 && pan.lx < 125 && Math.abs(pan.lz) < 105) {
+      if (y > PANTHEON_WORLD_POS.y + 42 && Math.hypot(pan.lx, pan.lz) < 24) return 'Le Panthéon • Colonnade Panoramique du Dôme (51,5 m)';
+      if (y < PANTHEON_WORLD_POS.y + 40 && ((pan.lx >= -35 && pan.lx <= 46 && Math.abs(pan.lz) < 16) || (Math.abs(pan.lx) < 16 && Math.abs(pan.lz) < 40))) {
+        if (pan.lx > 20) return 'Le Panthéon • Chœur, Convention Nationale & Crypte';
+        if (Math.hypot(pan.lx, pan.lz) < 16) return 'Le Panthéon • Croisée & Pendule de Foucault';
+        return 'Le Panthéon • Grande Nef Néoclassique';
+      }
+      if (pan.lz < -58 && pan.lx > -26 && pan.lx < 68) return 'Bibliothèque Sainte-Geneviève (Labrouste)';
+      if (pan.lx > 60 && pan.lz < -25) return 'Église Saint-Étienne-du-Mont • Quartier Latin';
+      if (pan.lx > 60 && pan.lz > 20) return 'Lycée Henri-IV & Tour Clovis';
+      return 'Place du Panthéon • Montagne Sainte-Geneviève';
+    }
+
     // 3. Proximité de la Seine ou des autres monuments
     if (distanceToPolyline(x, z, SEINE_POINTS) < 110 && y < 120) {
       return 'Paris • Rives de la Seine';
@@ -509,6 +591,8 @@ export function createCameraController({
         if (state.mode === 'orbit') {
           orbit.target.copy(anim.endLook);
           orbit.update();
+          const minCamY = Math.max(getParisElevation(camera.position.x, camera.position.z), 0) + 1.6;
+          if (camera.position.y < minCamY) camera.position.y = minCamY;
         } else {
           syncAnglesFromCamera();
         }
@@ -536,6 +620,8 @@ export function createCameraController({
         orbit.target.addScaledVector(moveVec, speed * clampedDt);
       }
       orbit.update();
+      const minCamY = Math.max(getParisElevation(camera.position.x, camera.position.z), 0) + 1.6;
+      if (camera.position.y < minCamY) camera.position.y = minCamY;
       return;
     }
 

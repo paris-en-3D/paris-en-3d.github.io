@@ -1,0 +1,734 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-20T16:28:14Z",
+  "steps": {
+    "saint-eustache/intro": [
+      {
+        "file": "photos/saint-eustache/intro-01.webp",
+        "badge": "Ma photo",
+        "caption": "Façade méridionale et rosace gothique flamboyant de Saint-Eustache",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/saint-eustache/intro-02.webp",
+        "badge": "Aujourd'hui",
+        "caption": "L'église Saint-Eustache vue depuis les jardins des Halles",
+        "credit": "Wikimedia Commons (Pline) • CC BY-SA 3.0"
+      },
+      {
+        "file": "photos/saint-eustache/intro-03.webp",
+        "badge": "Ma photo",
+        "caption": "Le maître-autel en marbre blanc et les verrières hautes du chœur",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "saint-eustache/facade-occidentale": [
+      {
+        "file": "photos/saint-eustache/facade-occidentale-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "La façade occidentale classique et sa tour Sud restée inachevée",
+        "credit": "Wikimedia Commons (Moonik) • CC BY-SA 3.0"
+      }
+    ],
+    "saint-eustache/grande-nef": [
+      {
+        "file": "photos/saint-eustache/grande-nef-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Perspective monumentale de la Grande Nef sous les voûtes à 33,5 m",
+        "credit": "Wikimedia Commons (Mbzt) • CC BY 3.0"
+      }
+    ],
+    "saint-eustache/grand-orgue": [
+      {
+        "file": "photos/saint-eustache/grand-orgue-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Le grand buffet d'orgue de Victor Baltard au-dessus de la tribune Ouest",
+        "credit": "Wikimedia Commons (Mbzt) • CC BY 3.0"
+      },
+      {
+        "file": "photos/saint-eustache/grand-orgue-02.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Les 8 000 tuyaux du Grand Orgue Van den Heuvel illuminés",
+        "credit": "Wikimedia Commons (Sebring12Hrs) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/saint-eustache/grand-orgue-03.webp",
+        "badge": "Détail",
+        "caption": "Détail des tourelles sculptées et des tuyaux de montre du Grand Orgue",
+        "credit": "Wikimedia Commons (Marie-Lan Nguyen) • CC BY 2.0 fr"
+      }
+    ],
+    "saint-eustache/chapelle-vierge": [
+      {
+        "file": "photos/saint-eustache/chapelle-vierge-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "La Chapelle axiale de la Vierge et ses fresques mariales",
+        "credit": "Wikimedia Commons (Ricardalovesmonuments) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/saint-eustache/chapelle-vierge-02.webp",
+        "badge": "Sculpture",
+        "caption": "La Vierge à l'Enfant en marbre blanc sculptée par Jean-Baptiste Pigalle",
+        "credit": "Wikimedia Commons (Ricardalovesmonuments) • CC BY-SA 4.0"
+      }
+    ],
+    "saint-eustache/tombeau-colbert": [
+      {
+        "file": "photos/saint-eustache/tombeau-colbert-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Monument funéraire de Jean-Baptiste Colbert dans le déambulatoire",
+        "credit": "Wikimedia Commons (Mbzt) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/saint-eustache/tombeau-colbert-02.webp",
+        "badge": "Sculpture",
+        "caption": "Colbert en prière sculpté par Antoine Coysevox et Jean-Baptiste Tuby",
+        "credit": "Wikimedia Commons (Mbzt) • CC BY-SA 3.0"
+      }
+    ],
+    "saint-eustache/transept-sud-meridien": [
+      {
+        "file": "photos/saint-eustache/transept-sud-meridien-01.webp",
+        "badge": "Ma photo",
+        "caption": "Panorama intérieur depuis la croisée du transept vers la chaire et le chœur",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "tour-eiffel/intro": [
+      {
+        "file": "photos/tour-eiffel/intro-01.webp",
+        "badge": "Archive 1888",
+        "caption": "Chantier de construction de la Tour Eiffel en 1888",
+        "credit": "Wikimedia Commons (Auteur d'époque) • Domaine public"
+      },
+      {
+        "file": "photos/tour-eiffel/intro-02.webp",
+        "badge": "Archive 1888",
+        "caption": "Élévation du deuxième étage de la Tour Eiffel en juillet 1888",
+        "credit": "Wikimedia Commons (Louis Rousselet) • Domaine public"
+      },
+      {
+        "file": "photos/tour-eiffel/intro-03.webp",
+        "badge": "Ma photo",
+        "caption": "Contre-plongée sur la dentelle de fer puddlé et le grand arc du 1er étage",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "tour-eiffel/eiffel-premier-etage": [
+      {
+        "file": "photos/tour-eiffel/eiffel-premier-etage-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Verrière du pavillon 58 Tour Eiffel au premier étage",
+        "credit": "Wikimedia Commons (Cristian Bortes from Cluj-Napoca, Romania) • CC BY 2.0"
+      },
+      {
+        "file": "photos/tour-eiffel/eiffel-premier-etage-02.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Galerie intérieure et structure métallique du premier étage (57,6 m)",
+        "credit": "Wikimedia Commons (Chad and Steph) • CC BY-SA 2.0"
+      },
+      {
+        "file": "photos/tour-eiffel/eiffel-premier-etage-03.webp",
+        "badge": "Structure",
+        "caption": "Poutres rivetées et plateformes de la Tour vues en contre-plongée",
+        "credit": "Wikimedia Commons (Ketounette) • CC BY-SA 4.0"
+      }
+    ],
+    "tour-eiffel/eiffel-ascenseurs": [
+      {
+        "file": "photos/tour-eiffel/eiffel-ascenseurs-01.webp",
+        "badge": "Archive 1889",
+        "caption": "Gravure d'époque du chemin des ascenseurs inclinés dans les piliers",
+        "credit": "Wikimedia Commons (Peulot) • Domaine public"
+      },
+      {
+        "file": "photos/tour-eiffel/eiffel-ascenseurs-02.webp",
+        "badge": "Génie 1889",
+        "caption": "Machinerie hydraulique historique d'un ascenseur de la Tour Eiffel",
+        "credit": "Wikimedia Commons (jeffwarder) • CC BY-SA 3.0"
+      }
+    ],
+    "tour-eiffel/eiffel-deuxieme-etage": [
+      {
+        "file": "photos/tour-eiffel/eiffel-deuxieme-etage-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Longue-vue panoramique sur le balcon du deuxième étage",
+        "credit": "Wikimedia Commons (Dietmar Rabich) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/tour-eiffel/eiffel-deuxieme-etage-02.webp",
+        "badge": "Panorama",
+        "caption": "Le Pont d'Iéna, le Palais de Chaillot et La Défense vus du 2e étage",
+        "credit": "Wikimedia Commons (TracyElaine from San Francisco, USA) • CC BY 2.0"
+      },
+      {
+        "file": "photos/tour-eiffel/eiffel-deuxieme-etage-03.webp",
+        "badge": "Ma photo",
+        "caption": "La Seine, l'Île aux Cygnes et le pont de Bir-Hakeim vus depuis la Tour",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "tour-eiffel/eiffel-sommet": [
+      {
+        "file": "photos/tour-eiffel/eiffel-sommet-01.webp",
+        "badge": "Archive 1889",
+        "caption": "Gustave Eiffel entouré de ses collaborateurs au sommet de la Tour",
+        "credit": "Wikimedia Commons (Tissandier Collection) • Domaine public"
+      },
+      {
+        "file": "photos/tour-eiffel/eiffel-sommet-02.webp",
+        "badge": "Archive",
+        "caption": "Gustave Eiffel dans son laboratoire scientifique de la Tour",
+        "credit": "Wikimedia Commons (Gustave Eiffel) • Domaine public"
+      }
+    ],
+    "tour-eiffel/eiffel-champ-de-mars": [
+      {
+        "file": "photos/tour-eiffel/eiffel-champ-de-mars-01.webp",
+        "badge": "Panorama",
+        "caption": "Les pelouses du Champ-de-Mars et l'École Militaire dans l'axe Sud-Est",
+        "credit": "Wikimedia Commons (Vinicius Pinheiro) • CC BY-SA 2.0"
+      },
+      {
+        "file": "photos/tour-eiffel/eiffel-champ-de-mars-02.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Perspective sur le Champ-de-Mars depuis le premier étage",
+        "credit": "Wikimedia Commons (Alf van Beem) • CC0"
+      }
+    ],
+    "tour-eiffel/eiffel-trocadero-iena": [
+      {
+        "file": "photos/tour-eiffel/eiffel-trocadero-iena-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "La Tour Eiffel vue depuis l'esplanade du Trocadéro",
+        "credit": "Wikimedia Commons (Daniel Stockman) • CC BY-SA 2.0"
+      }
+    ],
+    "arc-de-triomphe/intro": [
+      {
+        "file": "photos/arc-de-triomphe/intro-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "L'Arc de Triomphe de l'Étoile trônant sur la place Charles-de-Gaulle",
+        "credit": "Wikimedia Commons (Benh LIEU SONG) • CC BY-SA 3.0"
+      }
+    ],
+    "arc-de-triomphe/arc-marseillaise": [
+      {
+        "file": "photos/arc-de-triomphe/arc-marseillaise-01.webp",
+        "badge": "Sculpture",
+        "caption": "« Le Départ des Volontaires de 1792 » dit La Marseillaise, par François Rude",
+        "credit": "Wikimedia Commons (Jebulon) • CC0"
+      },
+      {
+        "file": "photos/arc-de-triomphe/arc-marseillaise-02.webp",
+        "badge": "Détail",
+        "caption": "Le génie ailé de la Liberté au sommet du haut-relief de Rude",
+        "credit": "Wikimedia Commons (Ana Paula Hirama) • CC BY-SA 2.0"
+      }
+    ],
+    "arc-de-triomphe/arc-soldat-inconnu": [
+      {
+        "file": "photos/arc-de-triomphe/arc-soldat-inconnu-01.webp",
+        "badge": "Mémoire",
+        "caption": "La Flamme Éternelle brûlant sur le bouclier de bronze ciselé",
+        "credit": "Wikimedia Commons (Jebulon) • CC0"
+      },
+      {
+        "file": "photos/arc-de-triomphe/arc-soldat-inconnu-02.webp",
+        "badge": "Mémoire",
+        "caption": "La dalle sacrée de la Tombe du Soldat inconnu sous la Grande Voûte",
+        "credit": "Wikimedia Commons (Sean MacEntee from Monaghan, Ireland) • CC BY 2.0"
+      }
+    ],
+    "arc-de-triomphe/arc-grande-voute": [
+      {
+        "file": "photos/arc-de-triomphe/arc-grande-voute-01.webp",
+        "badge": "Gravures",
+        "caption": "Noms des batailles et des généraux de l'Empire gravés sous les voûtes",
+        "credit": "Wikimedia Commons (Jorge Láscar from Melbourne, Australia) • CC BY 2.0"
+      },
+      {
+        "file": "photos/arc-de-triomphe/arc-grande-voute-02.webp",
+        "badge": "Gravures",
+        "caption": "Détail des colonnes de généraux gravées dans la pierre calcaire",
+        "credit": "Wikimedia Commons (Histoiremarbot) • CC BY-SA 4.0"
+      }
+    ],
+    "arc-de-triomphe/arc-frise-boucliers": [
+      {
+        "file": "photos/arc-de-triomphe/arc-frise-boucliers-01.webp",
+        "badge": "Détail",
+        "caption": "La grande frise sculptée, les caissons de la voûte et le drapeau tricolore",
+        "credit": "Wikimedia Commons (xiquinhosilva) • CC BY 2.0"
+      }
+    ],
+    "arc-de-triomphe/arc-terrasse-50m": [
+      {
+        "file": "photos/arc-de-triomphe/arc-terrasse-50m-01.webp",
+        "badge": "Panorama",
+        "caption": "Perspective de l'Axe Historique et des Champs-Élysées depuis la terrasse à 50 m",
+        "credit": "Wikimedia Commons (APK) • CC BY-SA 4.0"
+      }
+    ],
+    "arc-de-triomphe/arc-place-etoile": [
+      {
+        "file": "photos/arc-de-triomphe/arc-place-etoile-01.webp",
+        "badge": "Archive aérienne",
+        "caption": "Photographie aérienne ancienne de la Place de l'Étoile et de ses douze avenues",
+        "credit": "Wikimedia Commons (Auteur d'époque) • Domaine public"
+      }
+    ],
+    "arc-de-triomphe/arc-champs-elysees": [
+      {
+        "file": "photos/arc-de-triomphe/arc-champs-elysees-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "La grande montée des Champs-Élysées de la Concorde jusqu'à l'Arc",
+        "credit": "Wikimedia Commons (Palagret) • CC BY-SA 2.5"
+      },
+      {
+        "file": "photos/arc-de-triomphe/arc-champs-elysees-02.webp",
+        "badge": "Architecture",
+        "caption": "Façade Art déco du Théâtre des Champs-Élysées (quartier du Triangle d'Or)",
+        "credit": "Wikimedia Commons (Coldcreation) • CC BY 3.0"
+      },
+      {
+        "file": "photos/arc-de-triomphe/arc-champs-elysees-03.webp",
+        "badge": "Ma photo",
+        "caption": "Les Champs-Élysées illuminés la nuit face à l'Arc de Triomphe",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "palais-garnier/intro": [
+      {
+        "file": "photos/palais-garnier/intro-01.webp",
+        "badge": "Aujourd'hui",
+        "caption": "La façade principale du Palais Garnier, sa coupole vert-de-gris et ses groupes dorés",
+        "credit": "Wikimedia Commons (Thomas Oboe Lee) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/palais-garnier/intro-02.webp",
+        "badge": "Façade Ouest",
+        "caption": "Le Pavillon de l'Empereur et sa double rampe carrossable côté rue Scribe",
+        "credit": "Wikimedia Commons (Peter Menzel) • CC BY-SA 2.0"
+      }
+    ],
+    "palais-garnier/garnier-facade-loggia": [
+      {
+        "file": "photos/palais-garnier/garnier-facade-loggia-01.webp",
+        "badge": "Plan d'origine",
+        "caption": "Coupe architecturale du portique et de la loggia dessinée par Charles Garnier",
+        "credit": "Wikimedia Commons (Charles Garnier) • Domaine public"
+      }
+    ],
+    "palais-garnier/garnier-coupole-apollon": [
+      {
+        "file": "photos/palais-garnier/garnier-coupole-apollon-01.webp",
+        "badge": "Sculpture",
+        "caption": "« Apollon, la Poésie et la Musique » d'Aimé Millet brandissant sa lyre d'or",
+        "credit": "Wikimedia Commons (Chabe01) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/palais-garnier/garnier-coupole-apollon-02.webp",
+        "badge": "Toitures",
+        "caption": "La coupole en cuivre patiné vert-de-gris, le lanterneau et le pignon d'Apollon",
+        "credit": "Wikimedia Commons (Chabe01) • CC BY-SA 4.0"
+      }
+    ],
+    "palais-garnier/garnier-grand-escalier": [
+      {
+        "file": "photos/palais-garnier/garnier-grand-escalier-01.webp",
+        "badge": "Intérieur",
+        "caption": "La double révolution en marbres polychromes et les balcons du Grand Escalier d'Honneur",
+        "credit": "Wikimedia Commons (Benh LIEU SONG) • CC BY-SA 3.0"
+      },
+      {
+        "file": "photos/palais-garnier/garnier-grand-escalier-02.webp",
+        "badge": "Sculpture",
+        "caption": "L'une des grandes torchères féminines en bronze d'Albert-Ernest Carrier-Belleuse",
+        "credit": "Wikimedia Commons (Albert-Ernest Carrier-Belleuse) • Domaine public"
+      }
+    ],
+    "palais-garnier/garnier-grand-foyer": [
+      {
+        "file": "photos/palais-garnier/garnier-grand-foyer-01.webp",
+        "badge": "Galerie d'or",
+        "caption": "Perspective du Grand Foyer doré, de ses lustres monumentaux et de sa cheminée",
+        "credit": "Wikimedia Commons (Eric Pouhier / Rainer Zenz) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/palais-garnier/garnier-grand-foyer-02.webp",
+        "badge": "Plafonds",
+        "caption": "Détail des voussures dorées et des plafonds peints par Paul Baudry au Grand Foyer",
+        "credit": "Wikimedia Commons (Chatsam) • CC BY-SA 3.0"
+      }
+    ],
+    "palais-garnier/garnier-grande-salle-chagall": [
+      {
+        "file": "photos/palais-garnier/garnier-grande-salle-chagall-01.webp",
+        "badge": "Grande Salle",
+        "caption": "Les quatre niveaux de loges rouge et or et le célèbre rideau de scène en trompe-l'œil",
+        "credit": "Wikimedia Commons (Joe deSousa) • CC0"
+      },
+      {
+        "file": "photos/palais-garnier/garnier-grande-salle-chagall-02.webp",
+        "badge": "Détail",
+        "caption": "Colonnes cannelées dorées, cariatides et balcons sculptés des loges d'avant-scène",
+        "credit": "Wikimedia Commons (Anca Pandrea) • CC BY 2.0"
+      }
+    ],
+    "palais-garnier/garnier-place-opera": [
+      {
+        "file": "photos/palais-garnier/garnier-place-opera-01.webp",
+        "badge": "Perspective",
+        "caption": "La Place de l'Opéra, le Café de la Paix et la percée de l'Avenue de l'Opéra vus de la loggia",
+        "credit": "Wikimedia Commons (Zairon) • CC BY-SA 4.0"
+      }
+    ],
+    "notre-dame/intro": [
+      {
+        "file": "photos/notre-dame/intro-01.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Façade occidentale et tours depuis le parvis",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/intro-02.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Façade occidentale, portails et tours de 69 m",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "notre-dame/nd-facade-portails": [
+      {
+        "file": "photos/notre-dame/nd-facade-portails-01.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Portail du Jugement dernier et Galerie des Rois",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-facade-portails-02.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Façade occidentale, portails et tours de 69 m",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-facade-portails-03.webp",
+        "badge": "Aujourd'hui",
+        "caption": "Anneau portail de la Vierge Notre-Dame de Paris",
+        "credit": "Wikimedia Commons (Myrabella) • CC BY-SA 3.0"
+      }
+    ],
+    "notre-dame/nd-tours-chimeres": [
+      {
+        "file": "photos/notre-dame/nd-tours-chimeres-01.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Façade occidentale et tours depuis le parvis",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-tours-chimeres-02.webp",
+        "badge": "Chimères",
+        "caption": "F Paryz, kosc Notre Dame, fot I Nowicka (79)",
+        "credit": "Wikimedia Commons (Ivonna Nowicka) • CC BY-SA 4.0"
+      }
+    ],
+    "notre-dame/nd-fleche-charpente": [
+      {
+        "file": "photos/notre-dame/nd-fleche-charpente-01.webp",
+        "badge": "Restauration 2024",
+        "caption": "Paris, Notre Dame -- 2014 -- 1491",
+        "credit": "Wikimedia Commons (Dietmar Rabich) • CC BY-SA 4.0"
+      }
+    ],
+    "notre-dame/nd-grande-nef": [
+      {
+        "file": "photos/notre-dame/nd-grande-nef-01.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Voûtes sexpartites de la Grande Nef restaurée",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-grande-nef-02.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Colonnes et voûtes du déambulatoire",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-grande-nef-03.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Dallage en damier, stalles et perspective du Chœur",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-grande-nef-04.webp",
+        "badge": "Restauration 2024",
+        "caption": "Nave of Notre-Dame de Paris towards the portal, 2024 (1)",
+        "credit": "Wikimedia Commons (Ibex73) • CC BY 4.0"
+      }
+    ],
+    "notre-dame/nd-roses-vitraux": [
+      {
+        "file": "photos/notre-dame/nd-roses-vitraux-01.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Voûtes et croisée du transept",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-roses-vitraux-02.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Grande Rosace Nord et claire-voie du transept",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-roses-vitraux-03.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Grande Rosace Nord médiévale (13,1 m)",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-roses-vitraux-04.webp",
+        "badge": "Rose Nord",
+        "caption": "Rozeta Paryż notre-dame chalger",
+        "credit": "Wikimedia Commons (Krzysztof Mizera) • CC BY-SA 4.0"
+      }
+    ],
+    "notre-dame/nd-choeur-pieta": [
+      {
+        "file": "photos/notre-dame/nd-choeur-pieta-01.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Chapelle peinte Viollet-le-Duc et gisants",
+        "credit": "Photo personnelle (Laurent)"
+      },
+      {
+        "file": "photos/notre-dame/nd-choeur-pieta-02.webp",
+        "badge": "Sculpture",
+        "caption": "Descent from the Cross by Nicolas Coustou",
+        "credit": "Wikimedia Commons (Prajnadhyana) • CC BY-SA 3.0"
+      },
+      {
+        "file": "photos/notre-dame/nd-choeur-pieta-03.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Chapelle rayonnante étoilée et reliquaire doré",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "notre-dame/nd-chevet-parvis": [
+      {
+        "file": "photos/notre-dame/nd-chevet-parvis-01.webp",
+        "badge": "Ma photo",
+        "caption": "Notre-Dame — Décors polychromes et verrière d'une chapelle",
+        "credit": "Photo personnelle (Laurent)"
+      }
+    ],
+    "sacre-coeur/intro": [
+      {
+        "file": "photos/sacre-coeur/intro-01.webp",
+        "badge": "Vue générale",
+        "caption": "Paris - Basilique du Sacré-Cœur de Montmartre - 2025-09-30 23-31-57 001",
+        "credit": "Wikimedia Commons (Giò Terra ( Terragio67 )) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/sacre-coeur/intro-02.webp",
+        "badge": "Vue générale",
+        "caption": "Basilique du Sacré-Cœur 2026-01-03-2",
+        "credit": "Wikimedia Commons (Renée Kools) • CC BY 4.0"
+      }
+    ],
+    "sacre-coeur/sc-parvis-portique": [
+      {
+        "file": "photos/sacre-coeur/sc-parvis-portique-01.webp",
+        "badge": "Façade Sud",
+        "caption": "Basilique du Sacré-Cœur 2026-01-03-1",
+        "credit": "Wikimedia Commons (Renée Kools) • CC BY 4.0"
+      },
+      {
+        "file": "photos/sacre-coeur/sc-parvis-portique-02.webp",
+        "badge": "Façade Sud",
+        "caption": "Sacre Coeur cor Jesu-DSC 1455w",
+        "credit": "Wikimedia Commons (P e z i) • CC BY-SA 3.0"
+      }
+    ],
+    "sacre-coeur/sc-dome-lanternon": [
+      {
+        "file": "photos/sacre-coeur/sc-dome-lanternon-01.webp",
+        "badge": "Grand Dôme",
+        "caption": "Paris - Sacré-Cœur - Kuppel zur blauen Stunde",
+        "credit": "Wikimedia Commons (Taxiarchos228) • CC BY 3.0"
+      }
+    ],
+    "sacre-coeur/sc-interieur-mosaique": [
+      {
+        "file": "photos/sacre-coeur/sc-interieur-mosaique-01.webp",
+        "badge": "Mosaïque d'Or",
+        "caption": "Sacre Coeur - Choeur, Abside et Mosaique",
+        "credit": "Wikimedia Commons (Didier B ( Sam67fr )) • CC BY-SA 2.5"
+      },
+      {
+        "file": "photos/sacre-coeur/sc-interieur-mosaique-02.webp",
+        "badge": "Mosaïque d'Or",
+        "caption": "Sacre Coeur - Mosaique de l'abside",
+        "credit": "Wikimedia Commons (Didier B ( Sam67fr )) • CC BY-SA 2.5"
+      },
+      {
+        "file": "photos/sacre-coeur/sc-interieur-mosaique-03.webp",
+        "badge": "Mosaïque d'Or",
+        "caption": "Paris - Basilique du Sacré-Cœur de Montmartre - 1",
+        "credit": "Wikimedia Commons (This illustration was made by Peter Potrowl . Please…) • CC BY-SA 4.0"
+      }
+    ],
+    "sacre-coeur/sc-orgue-sanctuaire": [
+      {
+        "file": "photos/sacre-coeur/sc-orgue-sanctuaire-01.webp",
+        "badge": "Coupole",
+        "caption": "The interior of the north dome, Sacre Coeur, Paris",
+        "credit": "Wikimedia Commons (Stephencdickson) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/sacre-coeur/sc-orgue-sanctuaire-02.webp",
+        "badge": "Coupole",
+        "caption": "Basilique du Sacré-Cœur interior central dome 2026-01-03-1",
+        "credit": "Wikimedia Commons (Renée Kools) • CC BY 4.0"
+      }
+    ],
+    "sacre-coeur/sc-square-funiculaire": [
+      {
+        "file": "photos/sacre-coeur/sc-square-funiculaire-01.webp",
+        "badge": "Square Louise-Michel",
+        "caption": "Paris 75018 Square Louise-Michel stairs Sacré-Coeur 20160419 (02)",
+        "credit": "Wikimedia Commons (L-BBE) • CC BY 3.0"
+      },
+      {
+        "file": "photos/sacre-coeur/sc-square-funiculaire-02.webp",
+        "badge": "Square Louise-Michel",
+        "caption": "Sacre-Coeur - panoramio (1)",
+        "credit": "Wikimedia Commons (Roman SUZUKI) • CC BY 3.0"
+      }
+    ],
+    "sacre-coeur/sc-place-tertre": [
+      {
+        "file": "photos/sacre-coeur/sc-place-tertre-01.webp",
+        "badge": "Place du Tertre",
+        "caption": "Street artist on the Place du Tertre, 29 September 2016",
+        "credit": "Wikimedia Commons (John Gillespie from New York, USA) • CC BY-SA 2.0"
+      },
+      {
+        "file": "photos/sacre-coeur/sc-place-tertre-02.webp",
+        "badge": "Place du Tertre",
+        "caption": "Paris Montmartre Place du Tertre street artist at work 2026-01-03",
+        "credit": "Wikimedia Commons (Renée Kools) • CC BY 4.0"
+      }
+    ],
+    "pantheon/intro": [
+      {
+        "file": "photos/pantheon/intro-01.webp",
+        "badge": "Vue générale",
+        "caption": "Le Panthéon — Fronton sculpté, inscription dorée et dôme à colonnade",
+        "credit": "Wikimedia Commons (Jebulon for the photograph. Architect of the church:…) • Public domain"
+      },
+      {
+        "file": "photos/pantheon/intro-02.webp",
+        "badge": "Place du Panthéon",
+        "caption": "La Place du Panthéon, la Faculté de Droit et le péristyle de Soufflot",
+        "credit": "Wikimedia Commons (Jason Riedy from East Point, GA, USA) • CC BY 2.0"
+      }
+    ],
+    "pantheon/pantheon-portique-fronton": [
+      {
+        "file": "photos/pantheon/pantheon-portique-fronton-01.webp",
+        "badge": "Fronton sculpté",
+        "caption": "Le fronton de David d'Angers (1837) : La Patrie distribuant des couronnes",
+        "credit": "Wikimedia Commons (Dietmar Rabich) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/pantheon/pantheon-portique-fronton-02.webp",
+        "badge": "Péristyle",
+        "caption": "Les colonnes corinthiennes et la devise « Aux Grands Hommes la Patrie reconnaissante »",
+        "credit": "Wikimedia Commons (Ebe94) • CC BY-SA 3.0"
+      }
+    ],
+    "pantheon/pantheon-nef-foucault": [
+      {
+        "file": "photos/pantheon/pantheon-nef-foucault-01.webp",
+        "badge": "Pendule de Foucault",
+        "caption": "Le Pendule de Foucault oscillant sous la grande croisée du Panthéon",
+        "credit": "Wikimedia Commons (Britchi Mirela) • CC BY-SA 3.0"
+      },
+      {
+        "file": "photos/pantheon/pantheon-nef-foucault-02.webp",
+        "badge": "Cadran gradué",
+        "caption": "Détail du cadran gradué et de la sphère en laiton de Léon Foucault (1851)",
+        "credit": "Wikimedia Commons (urskalberer) • CC BY-SA 3.0"
+      }
+    ],
+    "pantheon/pantheon-triple-coupole": [
+      {
+        "file": "photos/pantheon/pantheon-triple-coupole-01.webp",
+        "badge": "Fresque céleste",
+        "caption": "La seconde coupole et l'Apothéose de Sainte Geneviève peinte par Antoine-Jean Gros",
+        "credit": "Wikimedia Commons • CC BY-SA"
+      },
+      {
+        "file": "photos/pantheon/pantheon-triple-coupole-02.webp",
+        "badge": "Coupe architecturale",
+        "caption": "Coupe historique de la triple coupole et des voûtes à caissons de Soufflot",
+        "credit": "Wikimedia Commons (Brongniart, Alexandre Théodore (Paris, 15–02–1739 -…) • CC0"
+      }
+    ],
+    "pantheon/pantheon-convention-crypte": [
+      {
+        "file": "photos/pantheon/pantheon-convention-crypte-01.webp",
+        "badge": "La Convention",
+        "caption": "La Convention Nationale (François-Léon Sicard, 1924) et la mosaïque d'Ernest Hébert",
+        "credit": "Wikimedia Commons (Zairon) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/pantheon/pantheon-convention-crypte-02.webp",
+        "badge": "Chœur Est",
+        "caption": "Détail du groupe sculpté de la Convention Nationale dans le chœur du Panthéon",
+        "credit": "Wikimedia Commons (Zairon) • CC BY-SA 4.0"
+      }
+    ],
+    "pantheon/pantheon-dome-colonnade": [
+      {
+        "file": "photos/pantheon/pantheon-dome-colonnade-01.webp",
+        "badge": "Dôme 83 m",
+        "caption": "Le tambour périptère à 32 colonnes corinthiennes et la frise de guirlandes",
+        "credit": "Wikimedia Commons (Maksim Sokolov (maxergon.com)) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/pantheon/pantheon-dome-colonnade-02.webp",
+        "badge": "Silhouette 83 m",
+        "caption": "Le dôme de plomb nervuré du Panthéon face aux Invalides et à la Tour Eiffel",
+        "credit": "Wikimedia Commons (Jebulon) • CC BY-SA 3.0"
+      }
+    ],
+    "pantheon/pantheon-belvedere-paris": [
+      {
+        "file": "photos/pantheon/pantheon-belvedere-paris-01.webp",
+        "badge": "Vue Rue Soufflot",
+        "caption": "Panorama depuis la colonnade du dôme vers la rue Soufflot et la Tour Eiffel",
+        "credit": "Wikimedia Commons (Simdaperce) • CC BY-SA 3.0"
+      },
+      {
+        "file": "photos/pantheon/pantheon-belvedere-paris-02.webp",
+        "badge": "Panorama Paris",
+        "caption": "Vue panoramique sur la Sorbonne et le Quartier Latin depuis le Panthéon",
+        "credit": "Wikimedia Commons (Simdaperce) • Public domain"
+      }
+    ],
+    "pantheon/pantheon-place-quartier-latin": [
+      {
+        "file": "photos/pantheon/pantheon-place-quartier-latin-01.webp",
+        "badge": "Ste-Geneviève",
+        "caption": "La Bibliothèque Sainte-Geneviève (Henri Labrouste, 1850) face au Panthéon",
+        "credit": "Wikimedia Commons (Thank you to indicate this credit line next to the i…) • CC BY-SA 4.0"
+      },
+      {
+        "file": "photos/pantheon/pantheon-place-quartier-latin-02.webp",
+        "badge": "Salle Labrouste",
+        "caption": "La célèbre grande salle de lecture à voûtes métalliques de la Bibliothèque Sainte-Geneviève",
+        "credit": "Wikimedia Commons (Lansiaux, Charles Joseph Antoine (Aniche, 09–03–1855…) • CC0"
+      }
+    ]
+  }
+}

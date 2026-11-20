@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Paris 3D — Explorateur Architectural à l’Échelle Réelle</title>
-  <meta name="description" content="Exploration 3D temps réel de Paris à l'échelle 1:1 : Église Saint-Eustache, Tour Eiffel, la Seine, cycle solaire dynamique et visites audio-guidées." />
+  <meta name="description" content="Exploration 3D temps réel de Paris à l'échelle 1:1 : Église Saint-Eustache, Tour Eiffel, Arc de Triomphe, Palais Garnier, Cathédrale Notre-Dame de Paris, Basilique du Sacré-Cœur de Montmartre, la Seine et visites audio-guidées." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -33,7 +33,7 @@
     <div class="loading-card glass-panel">
       <div class="loading-crest" aria-hidden="true">✦</div>
       <h1>Paris 3D Explorateur</h1>
-      <p class="loading-sub">Échelle réelle 1:1 • Saint-Eustache, Tour Eiffel &amp; Arc de Triomphe</p>
+      <p class="loading-sub">Échelle réelle 1:1 • Saint-Eustache, Tour Eiffel, Arc de Triomphe, Palais Garnier, Notre-Dame &amp; Sacré-Cœur</p>
       <div class="loading-bar" aria-hidden="true">
         <div id="loading-progress" class="loading-bar-fill"></div>
       </div>
@@ -264,6 +264,20 @@
     <h2 id="poi-card-title" class="poi-card-title">Titre du point d'intérêt</h2>
     <p id="poi-card-location" class="poi-card-location">Localisation</p>
 
+    <figure id="poi-card-media" class="poi-card-media" hidden>
+      <div class="poi-media-frame">
+        <img id="poi-card-img" loading="lazy" alt="" />
+        <span id="poi-photo-badge" class="poi-photo-badge" hidden></span>
+        <div class="poi-media-controls">
+          <button type="button" id="poi-photo-prev" class="poi-media-btn" hidden aria-label="Photo précédente" title="Photo précédente">‹</button>
+          <span id="poi-photo-counter" class="poi-photo-counter" hidden>1 / 1</span>
+          <button type="button" id="poi-photo-next" class="poi-media-btn" hidden aria-label="Photo suivante" title="Photo suivante">›</button>
+          <button type="button" id="btn-poi-zoom" class="poi-media-btn poi-zoom-btn" aria-label="Agrandir la photo en plein écran" title="Agrandir en plein écran">⤢</button>
+        </div>
+      </div>
+      <figcaption id="poi-card-credit" class="poi-card-credit"></figcaption>
+    </figure>
+
     <div class="poi-card-body">
       <p id="poi-card-history" class="poi-history"></p>
       <div class="poi-anecdote">
@@ -284,6 +298,31 @@
     <span class="zone-dot" aria-hidden="true"></span>
     <span id="zone-text">Paris • Quartier des Halles</span>
   </div>
+
+  <!-- Lightbox photo plein écran (sans interrompre la voix off) -->
+  <dialog id="photo-lightbox" class="photo-lightbox" aria-label="Aperçu photo grand format">
+    <div class="lightbox-shell glass-panel">
+      <button type="button" id="lightbox-close" class="icon-btn close-btn lightbox-close-btn" aria-label="Fermer l'aperçu photo" title="Fermer (Échap)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      </button>
+      <div class="lightbox-stage">
+        <button type="button" id="lightbox-prev" class="lightbox-nav-btn" hidden aria-label="Photo précédente">‹</button>
+        <img id="lightbox-img" alt="" />
+        <button type="button" id="lightbox-next" class="lightbox-nav-btn" hidden aria-label="Photo suivante">›</button>
+      </div>
+      <div class="lightbox-meta">
+        <div class="lightbox-title-row">
+          <span id="lightbox-badge" class="poi-photo-badge" hidden></span>
+          <p id="lightbox-caption" class="lightbox-caption"></p>
+          <span id="lightbox-counter" class="poi-photo-counter" hidden>1 / 1</span>
+        </div>
+        <p id="lightbox-credit" class="lightbox-credit"></p>
+      </div>
+    </div>
+  </dialog>
 
   <script type="module" src="js/main.js"></script>
 </body>

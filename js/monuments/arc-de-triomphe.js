@@ -79,87 +79,123 @@ function createChateauLandonStoneTexture() {
 }
 
 function createHighReliefTexture(variant = 'marseillaise') {
-  const w = 384;
-  const h = 640;
+  const w = 512;
+  const h = 768;
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;
   const ctx = c.getContext('2d');
 
-  // Fond de stèle sculptée en pierre calcaire blonde
+  // Fond de stèle sculptée en pierre calcaire blonde & niche ombrée
   const bg = ctx.createLinearGradient(0, 0, w, h);
-  bg.addColorStop(0, '#ddd1ba');
-  bg.addColorStop(0.5, '#e8dec9');
-  bg.addColorStop(1, '#cfc2aa');
+  bg.addColorStop(0, '#cfc2aa');
+  bg.addColorStop(0.45, '#e8dec9');
+  bg.addColorStop(1, '#c4b59a');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
-  // Cadre architectural en creux
-  ctx.strokeStyle = '#9c8e74';
-  ctx.lineWidth = 10;
-  ctx.strokeRect(10, 10, w - 20, h - 20);
+  ctx.strokeStyle = '#97886d';
+  ctx.lineWidth = 14;
+  ctx.strokeRect(12, 12, w - 24, h - 24);
+  ctx.strokeStyle = '#f2ead8';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(24, 24, w - 48, h - 48);
 
-  // Composition sculpturale en clair-obscur selon le groupe
   if (variant === 'marseillaise') {
-    // Génie ailé de la Liberté (haut) menant les volontaires en rang (bas)
-    ctx.fillStyle = '#c2b499';
+    // Génie ailé de la Liberté (haut) déployant ses grandes plumes sur les volontaires
+    ctx.fillStyle = '#baa98c';
     ctx.beginPath();
-    ctx.ellipse(w * 0.5, h * 0.25, 138, 92, 0, Math.PI, Math.PI * 2);
+    ctx.ellipse(w * 0.5, h * 0.25, 195, 120, 0, Math.PI, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#f3ebdc';
-    for (let feather = -5; feather <= 5; feather++) {
+    for (let feather = -7; feather <= 7; feather++) {
       ctx.save();
       ctx.translate(w * 0.5, h * 0.27);
-      ctx.rotate(feather * 0.19);
-      ctx.fillRect(-10, -130, 16, 118);
+      ctx.rotate(feather * 0.16);
+      ctx.fillStyle = feather % 2 === 0 ? '#f4ede0' : '#dfd2b8';
+      ctx.fillRect(-11, -172, 20, 152);
       ctx.restore();
     }
   } else if (variant === 'triomphe') {
-    // Cortot : Napoléon couronné par la Victoire et encadré de la Renommée
-    ctx.fillStyle = '#f3ebdc';
+    // Cortot : Napoléon Ier couronné par la Victoire ailée & palmes triomphales
+    ctx.fillStyle = '#c5b79c';
     ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.34, 72, 0, Math.PI * 2);
+    ctx.arc(w * 0.5, h * 0.29, 130, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = '#d4b25c';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.31, 68, 0.2, Math.PI * 1.8);
+    ctx.stroke();
+  } else if (variant === 'resistance') {
+    // Étex : Guerrier brandissant le glaive protégeant famille et drapeau
+    ctx.fillStyle = '#c4b69b';
+    ctx.beginPath();
+    ctx.ellipse(w * 0.5, h * 0.28, 135, 105, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#dfd3bb';
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.22, h * 0.42);
+    ctx.lineTo(w * 0.78, h * 0.16);
+    ctx.stroke();
+  } else {
+    // La Paix (Étex) : Minerve apaisée, rameau d'olivier & abondance
+    ctx.fillStyle = '#cfc2a8';
+    ctx.beginPath();
+    ctx.ellipse(w * 0.5, h * 0.3, 145, 95, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#efe7d6';
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.32, 94, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
   }
 
-  // Figures héroïques sculptées & draperies
+  // Groupes héroïques en haut-relief & draperies profondes
   const figs = [
-    [0.24, 0.62, 34, 150],
-    [0.44, 0.56, 38, 175],
-    [0.62, 0.59, 36, 165],
-    [0.78, 0.66, 32, 145],
+    [0.2, 0.64, 44, 195],
+    [0.39, 0.56, 52, 230],
+    [0.6, 0.58, 48, 220],
+    [0.8, 0.66, 42, 185],
   ];
   figs.forEach(([fx, fy, fw, fh], i) => {
     const cx = w * fx;
     const cy = h * fy;
-    ctx.fillStyle = 'rgba(72, 62, 48, 0.34)';
+    ctx.fillStyle = 'rgba(68, 58, 44, 0.38)';
     ctx.beginPath();
-    ctx.ellipse(cx + 8, cy + 8, fw * 0.78, fh * 0.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx + 12, cy + 12, fw * 0.82, fh * 0.52, 0, 0, Math.PI * 2);
     ctx.fill();
 
     const fg = ctx.createLinearGradient(cx - fw, cy, cx + fw, cy);
-    fg.addColorStop(0, '#eee5d4');
-    fg.addColorStop(0.6, '#d9ccb3');
-    fg.addColorStop(1, '#afa084');
+    fg.addColorStop(0, '#f4ede0');
+    fg.addColorStop(0.55, '#ddd0b7');
+    fg.addColorStop(1, '#a99a7e');
     ctx.fillStyle = fg;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, fw * 0.72, fh * 0.48, (i - 1.5) * 0.08, 0, Math.PI * 2);
+    ctx.ellipse(cx, cy, fw * 0.76, fh * 0.5, (i - 1.5) * 0.08, 0, Math.PI * 2);
     ctx.fill();
 
-    // Tête / casque sculpté
-    ctx.fillStyle = '#f4ede0';
+    // Tête / casque sculpté + bouclier
+    ctx.fillStyle = '#f6f0e4';
     ctx.beginPath();
-    ctx.arc(cx, cy - fh * 0.52, 16, 0, Math.PI * 2);
+    ctx.arc(cx, cy - fh * 0.53, 21, 0, Math.PI * 2);
     ctx.fill();
+    if (i % 2 === 1) {
+      ctx.strokeStyle = '#b49e72';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(cx - fw * 0.25, cy - fh * 0.1, 24, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   });
 
-  // Lances, glaives et drapeaux verticaux
-  ctx.strokeStyle = '#efe7d6';
-  ctx.lineWidth = 4;
-  [-70, -18, 36, 84].forEach((ox, idx) => {
+  // Lances, glaives et étendards verticaux
+  ctx.strokeStyle = '#f2ead8';
+  ctx.lineWidth = 5;
+  [-95, -24, 42, 108].forEach((ox, idx) => {
     ctx.beginPath();
-    ctx.moveTo(w * 0.5 + ox, h * 0.85);
-    ctx.lineTo(w * 0.5 + ox + (idx - 1.5) * 18, h * 0.18);
+    ctx.moveTo(w * 0.5 + ox, h * 0.88);
+    ctx.lineTo(w * 0.5 + ox + (idx - 1.5) * 22, h * 0.14);
     ctx.stroke();
   });
 
@@ -169,14 +205,57 @@ function createHighReliefTexture(variant = 'marseillaise') {
   return tex;
 }
 
+function createNarrativeBasReliefTexture() {
+  const w = 512;
+  const h = 256;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d');
+
+  ctx.fillStyle = '#d7cab0';
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = '#9b8d72';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(8, 8, w - 16, h - 16);
+
+  // Bas-relief de bataille épique (cavaliers, drapeaux, fantassins en clair-obscur)
+  for (let i = 0; i < 14; i++) {
+    const x = 36 + i * 33;
+    const isRider = i === 3 || i === 9;
+    const top = isRider ? 64 : 104 + ((i * 7) % 18);
+    ctx.fillStyle = 'rgba(72, 62, 46, 0.36)';
+    ctx.fillRect(x + 4, top + 4, isRider ? 26 : 16, 224 - top);
+    ctx.fillStyle = i % 2 === 0 ? '#efe7d5' : '#e2d6be';
+    ctx.fillRect(x, top, isRider ? 24 : 15, 220 - top);
+    ctx.beginPath();
+    ctx.arc(x + (isRider ? 12 : 7), top - 10, 9, 0, Math.PI * 2);
+    ctx.fill();
+    if (i % 3 === 1) {
+      ctx.strokeStyle = '#f2ebdc';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x + 6, 210);
+      ctx.lineTo(x + 26, 28);
+      ctx.stroke();
+    }
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
 function createCofferVaultTexture() {
-  const size = 512;
+  const size = 1024;
   const c = document.createElement('canvas');
   c.width = size;
   c.height = size;
   const ctx = c.getContext('2d');
 
-  ctx.fillStyle = '#dfd3bc';
+  ctx.fillStyle = '#e0d5be';
   ctx.fillRect(0, 0, size, size);
 
   const cells = 4;
@@ -188,30 +267,36 @@ function createCofferVaultTexture() {
       const cx = x + step * 0.5;
       const cy = y + step * 0.5;
 
-      // Caisson mouluré octogonal à plusieurs degrés d'ombre
-      ctx.fillStyle = '#b9ab90';
-      ctx.fillRect(x + 8, y + 8, step - 16, step - 16);
-      ctx.fillStyle = '#998b71';
+      // Caisson mouluré octogonal profond à 4 gradins d'ombre
+      ctx.strokeStyle = '#eee4cf';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(x + 10, y + 10, step - 20, step - 20);
+      ctx.fillStyle = '#baa98d';
       ctx.fillRect(x + 18, y + 18, step - 36, step - 36);
-      ctx.fillStyle = '#84765d';
-      ctx.fillRect(x + 28, y + 28, step - 56, step - 56);
+      ctx.fillStyle = '#97876c';
+      ctx.fillRect(x + 36, y + 36, step - 72, step - 72);
+      ctx.fillStyle = '#7c6e56';
+      ctx.fillRect(x + 54, y + 54, step - 108, step - 108);
 
-      // Rosace sculptée centrale dorée/ivoire
-      ctx.fillStyle = '#f2e8d4';
+      // Rosace sculptée centrale dorée/ivoire à double couronne de pétales
+      ctx.fillStyle = '#f3ead7';
       ctx.beginPath();
-      for (let p = 0; p < 8; p++) {
-        const a = (p / 8) * Math.PI * 2;
-        const px = cx + Math.cos(a) * 15;
-        const py = cy + Math.sin(a) * 15;
-        ctx.moveTo(px + 9, py);
-        ctx.arc(px, py, 9, 0, Math.PI * 2);
+      for (let p = 0; p < 12; p++) {
+        const a = (p / 12) * Math.PI * 2;
+        const px = cx + Math.cos(a) * 34;
+        const py = cy + Math.sin(a) * 34;
+        ctx.moveTo(px + 14, py);
+        ctx.arc(px, py, 14, 0, Math.PI * 2);
       }
       ctx.fill();
 
-      ctx.fillStyle = '#d4af5e';
+      ctx.fillStyle = '#d5ad54';
       ctx.beginPath();
-      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 17, 0, Math.PI * 2);
       ctx.fill();
+      ctx.strokeStyle = '#7c622e';
+      ctx.lineWidth = 3;
+      ctx.stroke();
     }
   }
 
@@ -225,8 +310,8 @@ function createCofferVaultTexture() {
 }
 
 function createGeneralsEngravingTexture() {
-  const w = 512;
-  const h = 1024;
+  const w = 1024;
+  const h = 1536;
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;
@@ -236,20 +321,26 @@ function createGeneralsEngravingTexture() {
   ctx.fillRect(0, 0, w, h);
 
   ctx.strokeStyle = '#9c8f76';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(14, 14, w - 28, h - 28);
+  ctx.lineWidth = 10;
+  ctx.strokeRect(22, 22, w - 44, h - 44);
+  ctx.strokeStyle = '#efe6d5';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(36, 36, w - 72, h - 72);
 
   // Cartouche supérieur des grandes victoires avec couronne de laurier
   ctx.fillStyle = '#cfc1a7';
-  ctx.fillRect(32, 34, w - 64, 128);
+  ctx.fillRect(58, 54, w - 116, 200);
   ctx.strokeStyle = '#b4944e';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(38, 40, w - 76, 116);
-  ctx.fillStyle = '#473e30';
-  ctx.font = 'bold 26px Georgia, serif';
+  ctx.lineWidth = 5;
+  ctx.strokeRect(70, 66, w - 140, 176);
+  ctx.fillStyle = '#3f3628';
+  ctx.font = 'bold 34px Georgia, serif';
   ctx.textAlign = 'center';
-  ctx.fillText('AUSTERLITZ • IÉNA', w * 0.5, 86);
-  ctx.fillText('FRIEDLAND • WAGRAM', w * 0.5, 126);
+  ctx.fillText('ARMÉES DU NORD • DE L’EST', w * 0.5, 118);
+  ctx.fillStyle = '#473e30';
+  ctx.font = 'bold 40px Georgia, serif';
+  ctx.fillText('AUSTERLITZ • IÉNA • MARENGO', w * 0.5, 172);
+  ctx.fillText('FRIEDLAND • WAGRAM • RIVOLI', w * 0.5, 222);
 
   // Colonnes de noms des généraux & maréchaux gravés dans la pierre
   const names = [
@@ -263,19 +354,19 @@ function createGeneralsEngravingTexture() {
     ['CAULAINCOURT', true], ['JUNOT', false], ['RAPP', false], ['DROUOT', false],
   ];
 
-  ctx.font = 'bold 17px Georgia, serif';
+  ctx.font = 'bold 28px Georgia, serif';
   ctx.textAlign = 'left';
   for (let col = 0; col < 2; col++) {
-    const xBase = col === 0 ? 44 : 268;
-    for (let row = 0; row < 28; row++) {
+    const xBase = col === 0 ? 78 : 534;
+    for (let row = 0; row < 29; row++) {
       const [name, fallen] = names[(row + col * 11) % names.length];
-      const y = 212 + row * 27;
-      ctx.fillStyle = '#4f4537';
+      const y = 324 + row * 40;
+      ctx.fillStyle = '#473d30';
       ctx.fillText(name, xBase, y);
       if (fallen) {
         // Les généraux morts au combat sont soulignés sur l'Arc de Triomphe
         ctx.fillStyle = '#6b5b44';
-        ctx.fillRect(xBase, y + 3, ctx.measureText(name).width, 2);
+        ctx.fillRect(xBase, y + 6, ctx.measureText(name).width, 3);
       }
     }
   }
@@ -287,39 +378,42 @@ function createGeneralsEngravingTexture() {
 }
 
 function createGrandFriezeTexture() {
-  const w = 1024;
-  const h = 128;
+  const w = 2048;
+  const h = 256;
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;
   const ctx = c.getContext('2d');
 
-  ctx.fillStyle = '#d5c7ad';
+  ctx.fillStyle = '#d4c6ac';
   ctx.fillRect(0, 0, w, h);
 
   // Moulures haut & bas de la Grande Frise
-  ctx.fillStyle = '#b4a589';
-  ctx.fillRect(0, 0, w, 10);
-  ctx.fillRect(0, h - 10, w, 10);
+  ctx.fillStyle = '#b1a184';
+  ctx.fillRect(0, 0, w, 18);
+  ctx.fillRect(0, h - 18, w, 18);
+  ctx.fillStyle = '#ece3d0';
+  ctx.fillRect(0, 18, w, 5);
+  ctx.fillRect(0, h - 23, w, 5);
 
-  // Frise continue de 48 silhouettes de soldats, cavaliers et allégories en bas-relief
-  for (let i = 0; i < 48; i++) {
-    const x = i * 21.3 + 8;
-    const stride = i % 3 === 0 ? 6 : 0;
-    ctx.fillStyle = 'rgba(85, 74, 58, 0.36)';
-    ctx.fillRect(x + 3, 28, 12, 82);
+  // Frise continue de 68 silhouettes de soldats, cavaliers et allégories en bas-relief
+  for (let i = 0; i < 68; i++) {
+    const x = i * 30 + 14;
+    const isCavalry = i % 7 === 0;
+    const stride = i % 3 === 0 ? 8 : 0;
+    ctx.fillStyle = 'rgba(78, 67, 51, 0.36)';
+    ctx.fillRect(x + 5, isCavalry ? 74 : 62, isCavalry ? 26 : 16, isCavalry ? 156 : 168);
     ctx.fillStyle = '#efe7d6';
-    ctx.fillRect(x, 30, 11, 78);
+    ctx.fillRect(x, isCavalry ? 70 : 58, isCavalry ? 24 : 15, isCavalry ? 156 : 168);
     ctx.beginPath();
-    ctx.arc(x + 5.5, 24 - stride * 0.3, 6, 0, Math.PI * 2);
+    ctx.arc(x + (isCavalry ? 14 : 7.5), (isCavalry ? 52 : 46) - stride * 0.35, 9, 0, Math.PI * 2);
     ctx.fill();
     if (i % 4 === 0) {
-      // Drapeau ou lance inclinée
       ctx.strokeStyle = '#efe7d6';
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.moveTo(x + 9, 105);
-      ctx.lineTo(x + 22, 14);
+      ctx.moveTo(x + 12, 215);
+      ctx.lineTo(x + 32, 24);
       ctx.stroke();
     }
   }
@@ -327,6 +421,117 @@ function createGrandFriezeTexture() {
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+function createPalmetteImpostTexture() {
+  const w = 512;
+  const h = 128;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d');
+
+  ctx.fillStyle = '#dfd4be';
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#b4a58a';
+  ctx.fillRect(0, 0, w, 18);
+  ctx.fillRect(0, h - 18, w, 18);
+
+  for (let x = 24; x < w; x += 48) {
+    ctx.fillStyle = '#f3ebda';
+    ctx.beginPath();
+    ctx.ellipse(x, h * 0.52, 16, 28, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#9f9075';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = '#efe6d4';
+    ctx.beginPath();
+    ctx.arc(x + 24, h * 0.52, 7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.repeat.set(4, 1);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+function createBattleShieldTexture() {
+  const size = 512;
+  const c = document.createElement('canvas');
+  c.width = size;
+  c.height = size;
+  const ctx = c.getContext('2d');
+  const cx = size * 0.5;
+  const cy = size * 0.5;
+
+  ctx.fillStyle = '#dfd4bd';
+  ctx.fillRect(0, 0, size, size);
+
+  // Couronne de chêne & laurier gravée autour du bouclier
+  ctx.strokeStyle = '#9f9074';
+  ctx.lineWidth = 18;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 224, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = '#efe7d6';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 206, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = '#b8964e';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 184, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = '#534737';
+  ctx.font = 'bold 42px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('VICTOIRE', cx, cy - 28);
+  ctx.fillText('EMPIRE', cx, cy + 56);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+function createSacredSlabTexture() {
+  const w = 512;
+  const h = 768;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d');
+
+  ctx.fillStyle = '#3d3936';
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = '#c89b3c';
+  ctx.lineWidth = 14;
+  ctx.strokeRect(24, 24, w - 48, h - 48);
+  ctx.strokeStyle = '#756b60';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(42, 42, w - 84, h - 84);
+
+  ctx.fillStyle = '#e8c978';
+  ctx.font = 'bold 34px Georgia, serif';
+  ctx.textAlign = 'center';
+  const lines = ['ICI REPOSE', 'UN SOLDAT', 'FRANÇAIS', 'MORT POUR', 'LA PATRIE', '1914 – 1918'];
+  lines.forEach((txt, i) => {
+    ctx.fillText(txt, w * 0.5, 210 + i * 74);
+  });
+
+  const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
   return tex;
@@ -430,7 +635,7 @@ function createCobbleRoundaboutTexture() {
   return tex;
 }
 
-function createMarechauxFacadeTexture() {
+function createMarechauxFacadeTexture({ emissiveOnly = false } = {}) {
   const w = 512;
   const h = 512;
   const c = document.createElement('canvas');
@@ -438,47 +643,64 @@ function createMarechauxFacadeTexture() {
   c.height = h;
   const ctx = c.getContext('2d');
 
-  // Hôtels des Maréchaux (Hittorff 1854) : façade blonde symétrique à arcades
-  ctx.fillStyle = '#e4d9c4';
-  ctx.fillRect(0, 0, w, h);
-
-  // Refends réguliers
-  ctx.fillStyle = 'rgba(95, 84, 68, 0.14)';
-  for (let y = 0; y < h; y += 22) {
-    ctx.fillRect(0, y, w, 1.5);
-  }
-
-  // Rez-de-chaussée à arcades en plein cintre
-  ctx.fillStyle = '#d3c6af';
-  ctx.fillRect(0, h - 120, w, 120);
-  for (let col = 0; col < 5; col++) {
-    const ax = 24 + col * 98;
-    ctx.fillStyle = '#2a333d';
-    ctx.fillRect(ax, h - 90, 56, 86);
-    ctx.beginPath();
-    ctx.arc(ax + 28, h - 90, 28, Math.PI, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // 3 étages nobles encadrés de pilastres
-  [276, 176, 78].forEach((fy, rIdx) => {
-    ctx.fillStyle = '#cdc0a7';
-    ctx.fillRect(0, fy + 76, w, 7);
-    for (let col = 0; col < 6; col++) {
-      const fx = 22 + col * 82;
-      ctx.fillStyle = '#f1eadb';
-      ctx.fillRect(fx - 4, fy - 4, 44, 72);
-      ctx.fillStyle = '#283644';
-      ctx.fillRect(fx, fy, 36, 64);
-      ctx.fillStyle = '#e6dfd1';
-      ctx.fillRect(fx + 17, fy, 2, 64);
-      ctx.fillRect(fx, fy + 26, 36, 2);
-      if (rIdx === 0 || rIdx === 2) {
-        ctx.fillStyle = '#25282c';
-        ctx.fillRect(0, fy + 58, w, 7);
+  if (emissiveOnly) {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, w, h);
+    for (let col = 0; col < 5; col++) {
+      const ax = 24 + col * 98;
+      if (col % 2 === 0) {
+        ctx.fillStyle = '#ffb85c';
+        ctx.fillRect(ax + 6, h - 84, 44, 74);
       }
     }
-  });
+    [276, 176, 78].forEach((fy, rIdx) => {
+      for (let col = 0; col < 6; col++) {
+        if ((col + rIdx) % 3 === 1) continue;
+        const fx = 22 + col * 82;
+        ctx.fillStyle = (col + rIdx) % 2 === 0 ? '#ffd080' : '#ffab4c';
+        ctx.fillRect(fx + 2, fy + 2, 32, 58);
+      }
+    });
+  } else {
+    // Hôtels des Maréchaux (Hittorff 1854) : façade blonde symétrique à arcades
+    ctx.fillStyle = '#e4d9c4';
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.fillStyle = 'rgba(95, 84, 68, 0.14)';
+    for (let y = 0; y < h; y += 22) {
+      ctx.fillRect(0, y, w, 1.5);
+    }
+
+    ctx.fillStyle = '#d3c6af';
+    ctx.fillRect(0, h - 120, w, 120);
+    for (let col = 0; col < 5; col++) {
+      const ax = 24 + col * 98;
+      ctx.fillStyle = '#2a333d';
+      ctx.fillRect(ax, h - 90, 56, 86);
+      ctx.beginPath();
+      ctx.arc(ax + 28, h - 90, 28, Math.PI, Math.PI * 2);
+      ctx.fill();
+    }
+
+    [276, 176, 78].forEach((fy, rIdx) => {
+      ctx.fillStyle = '#cdc0a7';
+      ctx.fillRect(0, fy + 76, w, 7);
+      for (let col = 0; col < 6; col++) {
+        const fx = 22 + col * 82;
+        ctx.fillStyle = '#f1eadb';
+        ctx.fillRect(fx - 4, fy - 4, 44, 72);
+        ctx.fillStyle = '#283644';
+        ctx.fillRect(fx, fy, 36, 64);
+        ctx.fillStyle = '#e6dfd1';
+        ctx.fillRect(fx + 17, fy, 2, 64);
+        ctx.fillRect(fx, fy + 26, 36, 2);
+        if (rIdx === 0 || rIdx === 2) {
+          ctx.fillStyle = '#25282c';
+          ctx.fillRect(0, fy + 58, w, 7);
+        }
+      }
+    });
+  }
 
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = THREE.RepeatWrapping;
@@ -552,13 +774,33 @@ export function buildArcDeTriompheMonument(scene) {
     roughness: 0.76,
     emissive: new THREE.Color(0x000000),
   });
+  const matBasRelief = new THREE.MeshStandardMaterial({
+    map: createNarrativeBasReliefTexture(),
+    roughness: 0.76,
+    emissive: new THREE.Color(0x000000),
+  });
+  const matImpost = new THREE.MeshStandardMaterial({
+    map: createPalmetteImpostTexture(),
+    roughness: 0.74,
+    emissive: new THREE.Color(0x000000),
+  });
+  const matShield = new THREE.MeshStandardMaterial({
+    map: createBattleShieldTexture(),
+    roughness: 0.72,
+    emissive: new THREE.Color(0x000000),
+  });
+  const matSacredSlab = new THREE.MeshStandardMaterial({
+    map: createSacredSlabTexture(),
+    roughness: 0.42,
+    metalness: 0.14,
+  });
   const matReliefs = {
     marseillaise: new THREE.MeshStandardMaterial({ map: createHighReliefTexture('marseillaise'), roughness: 0.75, emissive: new THREE.Color(0x000000) }),
     triomphe: new THREE.MeshStandardMaterial({ map: createHighReliefTexture('triomphe'), roughness: 0.75, emissive: new THREE.Color(0x000000) }),
     resistance: new THREE.MeshStandardMaterial({ map: createHighReliefTexture('resistance'), roughness: 0.75, emissive: new THREE.Color(0x000000) }),
     paix: new THREE.MeshStandardMaterial({ map: createHighReliefTexture('paix'), roughness: 0.75, emissive: new THREE.Color(0x000000) }),
   };
-  const nightLitStoneMats = [matStone, matStoneLight, matVaultCoffer, matFrieze, ...Object.values(matReliefs)];
+  const nightLitStoneMats = [matStone, matStoneLight, matVaultCoffer, matFrieze, matBasRelief, matImpost, matShield, ...Object.values(matReliefs)];
 
   const matBronzeDark = new THREE.MeshStandardMaterial({ color: 0x26282b, roughness: 0.48, metalness: 0.72 });
   const matGold = new THREE.MeshStandardMaterial({ color: 0xd9ad4e, roughness: 0.3, metalness: 0.82 });
@@ -572,8 +814,18 @@ export function buildArcDeTriompheMonument(scene) {
     polygonOffsetUnits: -6,
   });
   const matSidewalkStone = new THREE.MeshStandardMaterial({ color: 0xd6cebe, roughness: 0.86 });
-  const matMarechaux = new THREE.MeshStandardMaterial({ map: createMarechauxFacadeTexture(), roughness: 0.82 });
+  const texMarechauxEmissive = createMarechauxFacadeTexture({ emissiveOnly: true });
+  const matMarechaux = new THREE.MeshStandardMaterial({
+    map: createMarechauxFacadeTexture({ emissiveOnly: false }),
+    emissiveMap: texMarechauxEmissive,
+    emissive: new THREE.Color(0xffc978),
+    emissiveIntensity: 0.05,
+    roughness: 0.82,
+  });
   const matSlateRoof = new THREE.MeshStandardMaterial({ color: 0x3b4654, roughness: 0.54, metalness: 0.22 });
+  const matPresbourgAsphalt = new THREE.MeshStandardMaterial({ color: 0x3a3e46, roughness: 0.9 });
+  const matGardenLawn = new THREE.MeshStandardMaterial({ color: 0x4b7439, roughness: 0.92 });
+  const matIronRail = new THREE.MeshStandardMaterial({ color: 0x202428, roughness: 0.44, metalness: 0.62 });
   const matLampPost = new THREE.MeshStandardMaterial({ color: 0x222726, roughness: 0.5, metalness: 0.5 });
   const matLampGlow = new THREE.MeshStandardMaterial({
     color: 0xfff5d6,
@@ -613,19 +865,24 @@ export function buildArcDeTriompheMonument(scene) {
   const P_SPRING = 14.46;
   const ENTABL_Y = 35.80;
 
-  // A. 4 Grands Piliers d'angle (|lx| ∈ [7.31, 22.40], |lz| ∈ [4.22, 11.10]) + Socles granit + Impostes
+  // A. 4 Grands Piliers d'angle (|lx| ∈ [7.31, 22.40], |lz| ∈ [4.22, 11.10]) + Socles granit + Impostes à palmettes
   [-1, 1].forEach((sx) => {
     [-1, 1].forEach((sz) => {
       const px = sx * 14.855;
       const pz = sz * 7.66;
       addBox(15.09, ENTABL_Y, 6.88, px, ENTABL_Y * 0.5, pz, matStone);
-      // Socle mouluré en granit
-      addBox(15.65, 2.55, 7.45, px, 1.28, pz, matGranitePlinth);
-      // Corniche de socle & bandeau d'imposte de la Petite Voûte (y = 14,46 m)
-      addBox(15.5, 0.55, 7.35, px, 2.75, pz, matStoneLight, { cast: false });
-      addBox(15.6, 0.88, 7.4, px, P_SPRING, pz, matStoneLight);
+      // Socle mouluré en granit à double degré & refends d'angle
+      addBox(15.85, 1.35, 7.65, px, 0.68, pz, matGranitePlinth);
+      addBox(15.55, 1.3, 7.35, px, 1.98, pz, matGranitePlinth);
+      addBox(15.65, 0.55, 7.45, px, 2.85, pz, matStoneLight, { cast: false });
+      // Bandeau d'imposte sculpté à palmettes de la Petite Voûte (y = 14,46 m)
+      addBox(15.62, 0.92, 7.42, px, P_SPRING, pz, matImpost);
+      addBox(15.76, 0.34, 7.56, px, P_SPRING + 0.56, pz, matStoneLight, { cast: false });
 
-      // Colliders piétons à l'intérieur du pilier (permet le passage libre sous Grande et Petite Voûtes)
+      // Pilastres d'angle cannelés sur les arêtes extérieures
+      addBox(0.95, ENTABL_Y - 3.2, 0.95, sx * 22.42, (ENTABL_Y + 3.0) * 0.5, sz * 11.12, matStoneLight, { cast: false });
+
+      // Colliders piétons à l'intérieur du pilier
       [-4.4, 0, 4.4].forEach((ox) => {
         [-1.3, 1.3].forEach((oz) => {
           addLocalCircleCollider(px + ox, pz + oz, 2.65);
@@ -633,12 +890,13 @@ export function buildArcDeTriompheMonument(scene) {
       });
     });
 
-    // Massif plein au-dessus de la Petite Voûte (y = 18.68 .. 35.80) + imposte Grande Voûte (y = 21.88)
+    // Massif plein au-dessus de la Petite Voûte (y = 18.68 .. 35.80) + imposte à palmettes Grande Voûte (y = 21.88)
     const pPeak = P_SPRING + P_HALF; // 18.68
     addBox(15.09, ENTABL_Y - pPeak, P_HALF * 2, sx * 14.855, (ENTABL_Y + pPeak) * 0.5, 0, matStone);
-    addBox(15.65, 1.1, 22.8, sx * 14.855, G_SPRING, 0, matStoneLight);
+    addBox(15.72, 1.12, 22.84, sx * 14.855, G_SPRING, 0, matImpost);
+    addBox(15.88, 0.4, 23.0, sx * 14.855, G_SPRING + 0.68, 0, matStoneLight, { cast: false });
 
-    // Écoinçons extrudés de la Petite Voûte (z ∈ [-4.22, +4.22], y = 14.46 .. 18.72)
+    // Écoinçons extrudés de la Petite Voûte
     const pSpandrelShape = new THREE.Shape();
     pSpandrelShape.moveTo(-P_HALF, pPeak + 0.06);
     pSpandrelShape.lineTo(P_HALF, pPeak + 0.06);
@@ -658,7 +916,7 @@ export function buildArcDeTriompheMonument(scene) {
     pSpandrelMesh.receiveShadow = true;
     archGroup.add(pSpandrelMesh);
 
-    // Intrados caissonné de la Petite Voûte (12 voussoirs radiaux)
+    // Intrados caissonné de la Petite Voûte + doubleaux moulurés aux têtes
     const pSegs = 12;
     for (let k = 0; k < pSegs; k++) {
       const aMid = ((k + 0.5) / pSegs) * Math.PI;
@@ -669,12 +927,19 @@ export function buildArcDeTriompheMonument(scene) {
       vMesh.rotation.x = Math.PI * 0.5 - aMid;
     }
 
-    // Archivolte extérieure Petite Voûte (faces Est/Ouest des côtés Nord/Sud de l'Arc)
+    // Archivolte double, clé sculptée & médaillons latéraux Petite Voûte
     const sideArch = new THREE.Mesh(new THREE.TorusGeometry(P_HALF + 0.28, 0.34, 8, 22, Math.PI), matStoneLight);
     sideArch.rotation.y = Math.PI * 0.5;
     sideArch.position.set(sx * 22.42, P_SPRING, 0);
-    archGroup.add(sideArch);
-    addBox(0.95, 1.35, 1.15, sx * 22.58, pPeak + 0.25, 0, matStoneLight);
+    const sideArchInner = new THREE.Mesh(new THREE.TorusGeometry(P_HALF - 0.02, 0.16, 6, 22, Math.PI), matStoneLight);
+    sideArchInner.rotation.y = Math.PI * 0.5;
+    sideArchInner.position.set(sx * 22.42, P_SPRING, 0);
+    archGroup.add(sideArch, sideArchInner);
+    addBox(1.05, 1.55, 1.25, sx * 22.6, pPeak + 0.3, 0, matStoneLight);
+    [-4.6, 4.6].forEach((mz) => {
+      const med = addCylinder(1.05, 1.05, 0.32, 16, sx * 22.52, pPeak + 1.15, mz, matStoneLight, { cast: false });
+      med.rotation.z = Math.PI * 0.5;
+    });
   });
 
   // B. Grande Voûte centrale (lx ∈ [-7.31, +7.31], lz ∈ [-11.10, +11.10], y = 21.88 .. 35.80)
@@ -697,7 +962,7 @@ export function buildArcDeTriompheMonument(scene) {
   gSpandrelMesh.receiveShadow = true;
   archGroup.add(gSpandrelMesh);
 
-  // Intrados caissonné de la Grande Voûte (16 voussoirs radiaux sur toute la profondeur 22 m)
+  // Intrados caissonné de la Grande Voûte (16 voussoirs) + arcs doubleaux d'entrée
   const gSegs = 16;
   for (let k = 0; k < gSegs; k++) {
     const aMid = ((k + 0.5) / gSegs) * Math.PI;
@@ -707,32 +972,60 @@ export function buildArcDeTriompheMonument(scene) {
     const vMesh = addBox(segArcW, 0.22, 22.1, vx, vy, 0, matVaultCoffer, { cast: false });
     vMesh.rotation.z = aMid - Math.PI * 0.5;
   }
+  [-4.4, 4.4].forEach((dz) => {
+    const rib = new THREE.Mesh(new THREE.TorusGeometry(G_HALF - 0.06, 0.22, 6, 28, Math.PI), matStoneLight);
+    rib.position.set(0, G_SPRING, dz);
+    archGroup.add(rib);
+  });
 
-  // Archivoltes & Clés de voûte sculptées sur les façades Champs-Élysées (+Z) & Grande-Armée (-Z)
+  // Archivoltes doubles, clés sculptées & Renommées ailées de Pradier dans les écoinçons (+Z / -Z)
   [-11.14, 11.14].forEach((fz) => {
+    const nSign = Math.sign(fz);
     const grandArch = new THREE.Mesh(new THREE.TorusGeometry(G_HALF + 0.42, 0.46, 8, 28, Math.PI), matStoneLight);
     grandArch.position.set(0, G_SPRING, fz);
-    archGroup.add(grandArch);
-    addBox(1.5, 2.2, 0.9, 0, gPeak + 0.45, fz + Math.sign(fz) * 0.28, matStoneLight);
-    // Victoires ailées dans les écoinçons supérieurs de la Grande Voûte
-    [-6.2, 6.2].forEach((vx) => {
-      addBox(2.4, 3.4, 0.45, vx, gPeak + 1.1, fz + Math.sign(fz) * 0.12, matStoneLight);
+    const innerArch = new THREE.Mesh(new THREE.TorusGeometry(G_HALF + 0.02, 0.22, 6, 28, Math.PI), matStoneLight);
+    innerArch.position.set(0, G_SPRING, fz);
+    archGroup.add(grandArch, innerArch);
+
+    // Clé de voûte à console & buste casqué
+    addBox(1.55, 2.45, 0.95, 0, gPeak + 0.48, fz + nSign * 0.34, matStoneLight);
+    const keyBust = new THREE.Mesh(new THREE.SphereGeometry(0.54, 10, 8), matStoneLight);
+    keyBust.position.set(0, gPeak + 0.65, fz + nSign * 0.85);
+    archGroup.add(keyBust);
+
+    // 4 Renommées ailées sculptées de Pradier (courbe élégante + aile déployée + trompette & couronne dorées)
+    [-1, 1].forEach((sideX) => {
+      const rx = sideX * 5.35;
+      const ry = gPeak + 1.15;
+      const rz = fz + nSign * 0.32;
+      const body = addCylinder(0.42, 0.62, 3.2, 8, rx, ry, rz, matStoneLight);
+      body.rotation.z = sideX * 0.72;
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 8, 6), matStoneLight);
+      head.position.set(rx - sideX * 1.15, ry + 0.95, rz + nSign * 0.15);
+      archGroup.add(head);
+      const wing = addBox(2.5, 0.68, 0.28, rx + sideX * 0.75, ry + 1.3, rz, matStoneLight);
+      wing.rotation.z = sideX * -0.42;
+      const trumpet = addCylinder(0.06, 0.2, 2.1, 8, rx - sideX * 2.1, ry + 0.72, rz + nSign * 0.28, matGold, { cast: false });
+      trumpet.rotation.z = sideX * 1.15;
     });
   });
 
-  // C. Panneaux gravés des 660 Généraux & Batailles sous la Grande Voûte & Petites Voûtes
+  // C. Panneaux gravés des 660 Généraux encadrés de pilastres & couronnes de victoire dorées
   [-1, 1].forEach((sx) => {
     [-7.66, 7.66].forEach((pz) => {
-      addBox(0.14, 17.5, 6.4, sx * (G_HALF - 0.04), 12.2, pz, matEngraving, { cast: false });
+      addBox(0.24, 18.2, 6.85, sx * (G_HALF - 0.08), 12.2, pz, matStoneLight, { cast: false });
+      addBox(0.16, 17.5, 6.35, sx * (G_HALF - 0.02), 12.2, pz, matEngraving, { cast: false });
+      addBox(0.26, 0.65, 2.8, sx * (G_HALF - 0.02), 20.65, pz, matGold, { cast: false });
     });
   });
   [-1, 1].forEach((sz) => {
     [-14.855, 14.855].forEach((px) => {
-      addBox(14.2, 10.6, 0.14, px, 8.6, sz * (P_HALF - 0.04), matEngraving, { cast: false });
+      addBox(14.6, 11.1, 0.22, px, 8.6, sz * (P_HALF - 0.08), matStoneLight, { cast: false });
+      addBox(14.1, 10.5, 0.15, px, 8.6, sz * (P_HALF - 0.01), matEngraving, { cast: false });
     });
   });
 
-  // D. Les 4 Grands Hauts-Reliefs sculptés (y = 3,2 .. 15,8 m) + 6 Bas-Reliefs rectangulaires
+  // D. Les 4 Grands Hauts-Reliefs sculptés en 3D (y = 3,2 .. 15,8 m) + 6 Bas-Reliefs narratifs encadrés
   const reliefPlacements = [
     { px: +14.855, pz: +11.12, zSign: 1, key: 'marseillaise' }, // Pilier droit Champs-Élysées
     { px: -14.855, pz: +11.12, zSign: 1, key: 'triomphe' },     // Pilier gauche Champs-Élysées
@@ -741,127 +1034,191 @@ export function buildArcDeTriompheMonument(scene) {
   ];
 
   reliefPlacements.forEach(({ px, pz, zSign, key }) => {
-    const baseZ = pz + zSign * 0.72;
-    // Piédestal saillant du groupe sculpté
-    addBox(6.8, 2.9, 1.85, px, 4.3, baseZ, matStoneLight);
-    addBox(7.2, 0.45, 2.1, px, 5.85, baseZ, matStoneLight);
-    // Dalle haut-relief sculptée
-    addBox(6.4, 10.8, 0.55, px, 11.4, pz + zSign * 0.35, matReliefs[key]);
-    // Masses sculpturales 3D saillantes accrochant les ombres solaires
-    addBox(2.2, 5.4, 1.35, px - 1.1, 8.9, pz + zSign * 0.85, matStoneLight);
-    addBox(2.4, 5.8, 1.45, px + 1.05, 9.2, pz + zSign * 0.9, matStoneLight);
-    addBox(1.8, 3.6, 1.15, px, 12.6, pz + zSign * 0.95, matStoneLight);
+    const baseZ = pz + zSign * 0.78;
+    // Piédestal saillant à consoles sculptées
+    addBox(6.8, 2.9, 1.95, px, 4.3, baseZ, matStoneLight);
+    addBox(7.35, 0.5, 2.2, px, 5.85, baseZ, matStoneLight);
+    [-2.4, 2.4].forEach((cx) => {
+      addBox(0.85, 1.4, 1.5, px + cx, 2.4, baseZ - zSign * 0.2, matStoneLight);
+    });
+    // Dalle haut-relief + niche encadrée
+    addBox(6.9, 11.4, 0.45, px, 11.5, pz + zSign * 0.18, matStoneLight);
+    addBox(6.3, 10.6, 0.55, px, 11.4, pz + zSign * 0.36, matReliefs[key]);
 
-    if (key === 'marseillaise') {
-      // Grandes ailes déployées du Génie de la Liberté (Rude)
-      [-1, 1].forEach((wingSide) => {
-        const wing = addBox(3.4, 0.9, 0.48, px + wingSide * 1.9, 14.3, pz + zSign * 1.05, matStoneLight);
-        wing.rotation.z = wingSide * -0.45;
+    // Composition sculpturale 3D multi-figures (figure allégorique haute + 4 figures en action + boucliers & lances)
+    addCylinder(0.72, 1.1, 4.6, 10, px, 10.9, pz + zSign * 1.05, matStoneLight);
+    const centralHead = new THREE.Mesh(new THREE.SphereGeometry(0.5, 10, 8), matStoneLight);
+    centralHead.position.set(px, 13.65, pz + zSign * 1.12);
+    archGroup.add(centralHead);
+    const armUp = addBox(0.32, 2.0, 0.32, px + zSign * 0.65, 14.3, pz + zSign * 1.15, matStoneLight);
+    armUp.rotation.z = zSign * -0.4;
+
+    if (key === 'marseillaise' || key === 'triomphe') {
+      [-1, 1].forEach((ws) => {
+        [0, 1].forEach((tier) => {
+          const wing = addBox(3.3 - tier * 0.6, 0.62, 0.32, px + ws * (1.85 - tier * 0.3), 14.15 - tier * 0.58, pz + zSign * 1.05, matStoneLight);
+          wing.rotation.z = ws * (-0.42 + tier * 0.14);
+        });
       });
+    } else {
+      addCylinder(0.48, 0.65, 3.6, 8, px - 1.2, 8.2, pz + zSign * 1.1, matStoneLight);
     }
 
-    // Bas-relief rectangulaire encadré au-dessus de l'imposte (faces Est/Ouest)
-    addBox(7.8, 3.7, 0.55, px, 18.2, pz + zSign * 0.2, matStoneLight);
-    addBox(7.1, 3.0, 0.42, px, 18.2, pz + zSign * 0.4, matFrieze);
+    [-2.2, -0.95, 0.95, 2.2].forEach((ox, fi) => {
+      const fh = 3.8 + (fi % 2) * 0.7;
+      addCylinder(0.42, 0.58, fh, 8, px + ox, 6.1 + fh * 0.5, pz + zSign * 0.98, matStoneLight);
+      const fhSphere = new THREE.Mesh(new THREE.SphereGeometry(0.34, 8, 6), matStoneLight);
+      fhSphere.position.set(px + ox, 6.2 + fh + 0.25, pz + zSign * 1.05);
+      archGroup.add(fhSphere);
+      if (fi === 1 || fi === 2) {
+        const buckler = addCylinder(0.62, 0.62, 0.16, 12, px + ox * 1.2, 7.8, pz + zSign * 1.38, matStoneLight, { cast: false });
+        buckler.rotation.x = Math.PI * 0.5;
+      }
+      const spear = addCylinder(0.05, 0.06, 6.4, 6, px + ox * 0.9, 10.6, pz + zSign * 0.88, matStoneLight, { cast: false });
+      spear.rotation.z = (fi - 1.5) * 0.16;
+    });
+
+    // Bas-relief rectangulaire narratif encadré au-dessus de l'imposte (faces Est/Ouest)
+    addBox(8.0, 3.9, 0.58, px, 18.2, pz + zSign * 0.22, matStoneLight);
+    addBox(7.2, 3.1, 0.44, px, 18.2, pz + zSign * 0.42, matBasRelief);
   });
 
-  // 2 Grands Bas-Reliefs latéraux sur les façades Nord/Sud (au-dessus des Petites Voûtes)
+  // 2 Grands Bas-Reliefs latéraux narratifs sur les façades Nord/Sud (au-dessus des Petites Voûtes)
   [-22.5, 22.5].forEach((fx) => {
-    addBox(0.55, 4.4, 12.6, fx, 25.4, 0, matStoneLight);
-    addBox(0.45, 3.6, 11.6, fx + Math.sign(fx) * 0.16, 25.4, 0, matFrieze);
+    addBox(0.58, 4.6, 12.8, fx, 25.4, 0, matStoneLight);
+    addBox(0.46, 3.7, 11.7, fx + Math.sign(fx) * 0.18, 25.4, 0, matBasRelief);
   });
 
-  // E. Entablement, Grande Frise sculptée, Corniche à modillons & Attique aux 30 Boucliers (y = 35,8 .. 49,5 m)
-  // Architrave & Grande Frise périphérique
-  addBox(45.8, 1.1, 23.2, 0, 36.2, 0, matStoneLight);
-  addBox(45.6, 2.35, 23.0, 0, 37.9, 0, matFrieze);
-  // Grande corniche saillante à denticules / modillons (y = 39,8 m)
-  addBox(48.2, 1.25, 25.6, 0, 39.8, 0, matStoneLight);
-  for (let mx = -23.0; mx <= 23.0; mx += 2.0) {
-    addBox(0.65, 0.72, 24.4, mx, 39.15, 0, matStoneLight);
+  // E. Entablement, Grande Frise, Double rangée de Modillons & Attique aux 30 Boucliers & Glaives (y = 35,8 .. 49,5 m)
+  addBox(45.9, 1.15, 23.3, 0, 36.2, 0, matStoneLight);
+  addBox(45.6, 2.38, 23.0, 0, 37.9, 0, matFrieze);
+  // Grande corniche saillante à denticules & modillons (y = 39,8 m)
+  addBox(48.6, 1.3, 26.0, 0, 39.8, 0, matStoneLight);
+  for (let mx = -23.0; mx <= 23.0; mx += 1.45) {
+    addBox(0.56, 0.78, 24.8, mx, 39.15, 0, matStoneLight);
   }
-  for (let mz = -11.4; mz <= 11.4; mz += 2.0) {
-    addBox(47.0, 0.72, 0.65, 0, 39.15, mz, matStoneLight);
+  for (let mz = -11.4; mz <= 11.4; mz += 1.45) {
+    addBox(47.4, 0.78, 0.56, 0, 39.15, mz, matStoneLight);
   }
 
-  // Étage d'Attique (y = 40,4 .. 48,8 m) + 30 Boucliers sculptés (11 Est, 11 Ouest, 4 Nord, 4 Sud)
+  // Étage d'Attique (y = 40,4 .. 48,8 m) + 30 Boucliers gravés & Glaives verticaux (11 Est, 11 Ouest, 4 Nord, 4 Sud)
   addBox(44.8, 8.2, 22.2, 0, 44.5, 0, matStone);
-  addBox(45.6, 0.65, 23.0, 0, 40.7, 0, matStoneLight);
-  addBox(46.0, 0.9, 23.4, 0, 48.95, 0, matStoneLight);
+  addBox(45.7, 0.7, 23.1, 0, 40.7, 0, matStoneLight);
+  addBox(46.3, 0.95, 23.7, 0, 48.95, 0, matStoneLight);
 
-  // 11 Boucliers Est (+Z) & 11 Boucliers Ouest (-Z)
   for (let s = 0; s < 11; s++) {
     const sx = -19.0 + s * 3.8;
     [-11.2, 11.2].forEach((sz) => {
-      const shield = addCylinder(1.06, 1.06, 0.34, 18, sx, 44.6, sz, matStoneLight);
-      shield.rotation.x = Math.PI * 0.5;
-      const boss = addCylinder(0.28, 0.34, 0.22, 12, sx, 44.6, sz + Math.sign(sz) * 0.2, matGold);
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(1.08, 0.14, 8, 22), matStoneLight);
+      rim.position.set(sx, 44.6, sz);
+      archGroup.add(rim);
+      const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.06, 1.06, 0.24, 22), matShield);
+      disc.rotation.x = Math.PI * 0.5;
+      disc.position.set(sx, 44.6, sz);
+      archGroup.add(disc);
+      const boss = addCylinder(0.28, 0.34, 0.22, 12, sx, 44.6, sz + Math.sign(sz) * 0.18, matGold);
       boss.rotation.x = Math.PI * 0.5;
       if (s < 10) {
-        addBox(0.45, 7.6, 0.35, sx + 1.9, 44.6, sz, matStoneLight, { cast: false });
+        addBox(0.42, 7.6, 0.35, sx + 1.9, 44.6, sz, matStoneLight, { cast: false });
+        addBox(0.14, 4.4, 0.18, sx + 1.9, 44.5, sz + Math.sign(sz) * 0.2, matStoneLight, { cast: false });
+        addBox(0.48, 0.18, 0.22, sx + 1.9, 42.7, sz + Math.sign(sz) * 0.22, matGold, { cast: false });
       }
     });
   }
-  // 4 Boucliers Nord (-X) & 4 Boucliers Sud (+X)
   for (let s = 0; s < 4; s++) {
     const sz = -6.0 + s * 4.0;
     [-22.5, 22.5].forEach((sx) => {
-      const shield = addCylinder(1.06, 1.06, 0.34, 18, sx, 44.6, sz, matStoneLight);
-      shield.rotation.z = Math.PI * 0.5;
-      const boss = addCylinder(0.28, 0.34, 0.22, 12, sx + Math.sign(sx) * 0.2, 44.6, sz, matGold);
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(1.08, 0.14, 8, 22), matStoneLight);
+      rim.rotation.y = Math.PI * 0.5;
+      rim.position.set(sx, 44.6, sz);
+      archGroup.add(rim);
+      const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.06, 1.06, 0.24, 22), matShield);
+      disc.rotation.z = Math.PI * 0.5;
+      disc.position.set(sx, 44.6, sz);
+      archGroup.add(disc);
+      const boss = addCylinder(0.28, 0.34, 0.22, 12, sx + Math.sign(sx) * 0.18, 44.6, sz, matGold);
       boss.rotation.z = Math.PI * 0.5;
       if (s < 3) {
-        addBox(0.35, 7.6, 0.45, sx, 44.6, sz + 2.0, matStoneLight, { cast: false });
+        addBox(0.35, 7.6, 0.42, sx, 44.6, sz + 2.0, matStoneLight, { cast: false });
+        addBox(0.18, 4.4, 0.14, sx + Math.sign(sx) * 0.2, 44.5, sz + 2.0, matStoneLight, { cast: false });
       }
     });
   }
 
-  // F. Terrasse Panoramique visitable au sommet (y = 49,55 m -> 67,55 m absolu)
+  // F. Terrasse Panoramique visitable (y = 49,55 m) : balustres tournés, édicule & jumelles panoramiques
   addBox(43.2, 0.32, 20.6, 0, 49.4, 0, matSidewalkStone, { cast: false });
-  // Balustrade périphérique ajourée (sécurité sans boucher la vue sur Paris)
   [-10.2, 10.2].forEach((bz) => {
-    addBox(44.0, 0.56, 0.65, 0, 49.82, bz, matStoneLight);
-    addBox(44.2, 0.16, 0.72, 0, 50.85, bz, matStoneLight, { cast: false });
-    for (let bx = -21.2; bx <= 21.2; bx += 2.65) {
-      addBox(0.38, 0.85, 0.42, bx, 50.42, bz, matStoneLight, { cast: false });
+    addBox(44.2, 0.52, 0.65, 0, 49.82, bz, matStoneLight);
+    addBox(44.4, 0.18, 0.72, 0, 50.86, bz, matStoneLight, { cast: false });
+    for (let bx = -21.0; bx <= 21.0; bx += 1.5) {
+      addCylinder(0.14, 0.18, 0.86, 8, bx, 50.42, bz, matStoneLight, { cast: false });
     }
   });
   [-21.7, 21.7].forEach((bx) => {
-    addBox(0.65, 0.56, 21.0, bx, 49.82, 0, matStoneLight);
-    addBox(0.72, 0.16, 21.2, bx, 50.85, 0, matStoneLight, { cast: false });
-    for (let bz = -9.2; bz <= 9.2; bz += 2.3) {
-      addBox(0.42, 0.85, 0.38, bx, 50.42, bz, matStoneLight, { cast: false });
+    addBox(0.65, 0.52, 21.0, bx, 49.82, 0, matStoneLight);
+    addBox(0.72, 0.18, 21.2, bx, 50.86, 0, matStoneLight, { cast: false });
+    for (let bz = -9.6; bz <= 9.6; bz += 1.6) {
+      addCylinder(0.14, 0.18, 0.86, 8, bx, 50.42, bz, matStoneLight, { cast: false });
     }
   });
-  // Édicule central de sortie de l'escalier (284 marches)
-  addBox(3.8, 2.3, 4.4, 0, 50.65, -4.8, matStone);
-  addBox(4.2, 0.35, 4.8, 0, 51.9, -4.8, matStoneLight);
-  // 4 Tables d'orientation panoramiques en bronze (Champs-Élysées, Grande-Armée, Tour Eiffel, Sacré-Cœur)
+  addBox(3.8, 2.35, 4.4, 0, 50.65, -4.8, matStone);
+  addBox(4.3, 0.38, 4.9, 0, 51.95, -4.8, matStoneLight);
+  addBox(1.5, 1.9, 0.2, 0, 50.5, -2.55, matBronzeDark, { cast: false });
+  // 4 Tables d'orientation panoramiques + longues-vues
   [[0, 8.2, 0], [0, -8.2, Math.PI], [19.4, 0, Math.PI * 0.5], [-19.4, 0, -Math.PI * 0.5]].forEach(([tx, tz, ry]) => {
     const tbl = new THREE.Group();
     tbl.position.set(tx, 49.55, tz);
     tbl.rotation.y = ry;
-    addBox(0.6, 1.05, 0.5, 0, 0.52, 0, matStoneLight, { parent: tbl });
-    const plate = addBox(1.85, 0.12, 0.85, 0, 1.08, 0, matGold, { cast: false, parent: tbl });
+    addBox(0.62, 1.05, 0.52, 0, 0.52, 0, matStoneLight, { parent: tbl });
+    const plate = addBox(1.9, 0.12, 0.88, 0, 1.08, 0, matGold, { cast: false, parent: tbl });
     plate.rotation.x = 0.25;
+    addCylinder(0.06, 0.08, 1.3, 8, 1.4, 0.65, 0, matBronzeDark, { cast: false, parent: tbl });
+    const viewer = addCylinder(0.11, 0.09, 0.42, 8, 1.4, 1.32, 0, matBronzeDark, { cast: false, parent: tbl });
+    viewer.rotation.x = Math.PI * 0.5;
     archGroup.add(tbl);
   });
 
-  // G. Tombe du Soldat Inconnu & Bouclier-Brasier de la Flamme Éternelle ((0, 0, 0) sous la Grande Voûte)
-  addBox(3.4, 0.14, 5.2, 0, 0.25, 0.2, matTombGranite, { cast: false });
-  addBox(2.9, 0.04, 4.6, 0, 0.33, 0.2, matGold, { cast: false });
-  addBox(2.65, 0.05, 4.35, 0, 0.34, 0.2, matTombGranite, { cast: false });
-  // Socle circulaire du brasier aux glaives
-  addCylinder(0.88, 1.08, 0.22, 16, 0, 0.42, -1.25, matBronzeDark);
-  addCylinder(0.56, 0.72, 0.16, 12, 0, 0.56, -1.25, matGold, { cast: false });
-  // 8 bornes-obus en bronze autour de la Dalle Sacrée
-  [
-    [-2.05, -2.5], [2.05, -2.5], [-2.05, 0.2], [2.05, 0.2],
-    [-2.05, 2.9],  [2.05, 2.9],  [-0.95, 2.9], [0.95, 2.9],
-  ].forEach(([bx, bz]) => {
-    addCylinder(0.14, 0.18, 0.85, 8, bx, 0.62, bz, matBronzeDark);
+  // G. Tombe du Soldat Inconnu : Dalle Sacrée gravée, Brasier aux Glaives & Bornes reliées par chaînes
+  addBox(3.5, 0.14, 5.4, 0, 0.25, 0.2, matTombGranite, { cast: false });
+  addBox(3.05, 0.04, 4.85, 0, 0.33, 0.2, matGold, { cast: false });
+  addBox(2.85, 0.05, 4.6, 0, 0.34, 0.2, matSacredSlab, { cast: false });
+  // Bouclier-brasier ciselé d'Edgar Brandt aux 12 glaives rayonnants
+  addCylinder(0.95, 1.15, 0.2, 20, 0, 0.42, -1.25, matBronzeDark);
+  addCylinder(0.6, 0.78, 0.16, 14, 0, 0.56, -1.25, matGold, { cast: false });
+  for (let b = 0; b < 12; b++) {
+    const ba = (b / 12) * Math.PI * 2;
+    const sword = addBox(0.14, 0.04, 0.78, Math.cos(ba) * 0.72, 0.52, -1.25 + Math.sin(ba) * 0.72, matGold, { cast: false });
+    sword.rotation.y = -ba + Math.PI * 0.5;
+  }
+  // Couronne de laurier en bronze doré déposée au pied de la Dalle
+  const wreath = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.1, 8, 18), matGold);
+  wreath.rotation.x = Math.PI * 0.5;
+  wreath.position.set(0, 0.44, 1.85);
+  archGroup.add(wreath);
+
+  // 8 bornes-obus en bronze reliées par chaînes périphériques
+  const bollardCoords = [
+    [-2.1, -2.5], [0, -2.5], [2.1, -2.5],
+    [2.1, 0.2], [2.1, 2.9], [0, 2.9],
+    [-2.1, 2.9], [-2.1, 0.2],
+  ];
+  bollardCoords.forEach(([bx, bz], i) => {
+    addCylinder(0.14, 0.19, 0.88, 8, bx, 0.64, bz, matBronzeDark);
+    const [nx, nz] = bollardCoords[(i + 1) % bollardCoords.length];
+    if (!(i === 4 || i === 5)) { // Laisse l'accès symbolique côté Est libre ou relié bas
+      const len = Math.hypot(nx - bx, nz - bz);
+      const chain = addCylinder(0.03, 0.03, len, 6, (bx + nx) * 0.5, 0.88, (bz + nz) * 0.5, matBronzeDark, { cast: false });
+      chain.rotation.z = Math.PI * 0.5;
+      chain.rotation.y = -Math.atan2(nz - bz, nx - bx);
+    }
   });
-  addLocalCircleCollider(0, 0.2, 2.7);
+  addLocalCircleCollider(0, 0.2, 2.75);
+
+  // Lumière chaude dirigée vers les caissons & gravures de la Grande Voûte (LOD 0 uniquement)
+  const vaultLight = new THREE.PointLight(0xffcb82, 15, 48, 1.35);
+  vaultLight.position.set(0, 18.0, 0);
+  vaultLight.castShadow = false;
+  archGroup.add(vaultLight);
 
   // Flamme Éternelle animée (3 flammes émissives imbriquées + PointLight chaude)
   flameGroup.position.set(0, 0.65, -1.25);
@@ -883,7 +1240,7 @@ export function buildArcDeTriompheMonument(scene) {
 
   /**
    * ==========================================================================
-   * 2. PLACE CHARLES-DE-GAULLE : ÉTOILE DE PAVÉS, ROND-POINT & 12 HÔTELS DES MARÉCHAUX
+   * 2. PLACE CHARLES-DE-GAULLE : ÉTOILE, RUE DE PRESBOURG/TILSITT & 12 HÔTELS EN U
    * ==========================================================================
    */
   // A. Parvis central bicolore à 12 branches (r = 45,5 m)
@@ -892,13 +1249,12 @@ export function buildArcDeTriompheMonument(scene) {
   parvisMesh.receiveShadow = true;
   envGroup.add(parvisMesh);
 
-  // Couronne de bornes en granit autour du terre-plein central (r = 44,5 m)
   for (let i = 0; i < 36; i++) {
     const a = (i / 36) * Math.PI * 2;
     addCylinder(0.16, 0.2, 0.95, 6, Math.cos(a) * 44.4, 0.65, Math.sin(a) * 44.4, matGranitePlinth, { parent: envGroup });
   }
 
-  // B. Chaussée pavée du Rond-Point de l'Étoile (r = 45,5 .. 84 m) avec UVs polaires concentriques sans couture
+  // B. Chaussée pavée du Rond-Point de l'Étoile (r = 45,5 .. 84 m)
   const tSegs = 64;
   const pSegs = 2;
   const ringGeo = new THREE.RingGeometry(45.5, 84, tSegs, pSegs);
@@ -914,6 +1270,35 @@ export function buildArcDeTriompheMonument(scene) {
   ringRoadMesh.receiveShadow = true;
   envGroup.add(ringRoadMesh);
 
+  // Anneau extérieur Rue de Presbourg & Rue de Tilsitt (r = 130,5 .. 143,5 m) ceinturant les Hôtels des Maréchaux
+  const presbourgRoadGeo = new THREE.RingGeometry(132.5, 141.5, 72, 1);
+  presbourgRoadGeo.rotateX(-Math.PI * 0.5);
+  const presbourgRoadMesh = new THREE.Mesh(presbourgRoadGeo, matPresbourgAsphalt);
+  presbourgRoadMesh.position.y = 0.08;
+  presbourgRoadMesh.receiveShadow = true;
+  envGroup.add(presbourgRoadMesh);
+
+  [[130.0, 132.6], [141.4, 144.0]].forEach(([rIn, rOut]) => {
+    const swGeo = new THREE.RingGeometry(rIn, rOut, 72, 1);
+    swGeo.rotateX(-Math.PI * 0.5);
+    const swMesh = new THREE.Mesh(swGeo, matSidewalkStone);
+    swMesh.position.y = 0.11;
+    swMesh.receiveShadow = true;
+    envGroup.add(swMesh);
+  });
+
+  // Passages piétons & îlots refuges aux débouchés des 12 avenues (r = 85 m)
+  for (let k = 0; k < 12; k++) {
+    const a = k * (Math.PI / 6);
+    const rx = -Math.sin(a) * 85.2;
+    const rz = Math.cos(a) * 85.2;
+    const refMesh = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.24, 5.2), matGranitePlinth);
+    refMesh.position.set(rx, 0.22, rz);
+    refMesh.rotation.y = Math.PI - a;
+    refMesh.receiveShadow = true;
+    envGroup.add(refMesh);
+  }
+
   // C. Deux trémies d'accès du Passage du Souvenir (Champs-Élysées +36 et Grande-Armée -36)
   [-36, 36].forEach((tz) => {
     const sgn = Math.sign(tz);
@@ -922,8 +1307,9 @@ export function buildArcDeTriompheMonument(scene) {
     addBox(3.8, 0.95, 0.22, 0, 0.65, tz + sgn * 3.8, matBronzeDark, { parent: envGroup });
   });
 
-  // D. Les 12 Hôtels des Maréchaux (Hittorff, 1854) dans les 12 secteurs réguliers (entre les 12 avenues à 30°)
+  // D. Les 12 Hôtels des Maréchaux en U (Hittorff 1854) + Jardins d'honneur clos de grilles & lucarnes
   const lampPositions = [];
+  const gardenTrees = [];
   for (let i = 0; i < 16; i++) {
     const a = (i / 16) * Math.PI * 2;
     lampPositions.push([Math.cos(a) * 42.5, 0.26, Math.sin(a) * 42.5]);
@@ -936,36 +1322,66 @@ export function buildArcDeTriompheMonument(scene) {
     const tanX = Math.cos(midTheta);
     const tanZ = Math.sin(midTheta);
 
-    // Chaque Hôtel s'inscrit exactement à r = 109 m dans son secteur de 30° avec marge libre des avenues
-    const hotelR = 110;
-    const hotelW = k === 0 || k === 11 ? 20.5 : k === 4 || k === 5 ? 21.5 : 26.5;
-    const hotelD = 18.0;
-    const hotelH = 19.5; // Gabarit impérial uniforme imposé en 1854
+    const isChampsAdjacent = k === 0 || k === 11;
+    const isFochAdjacent = k === 4 || k === 5 || k === 6;
+    const hotelR = 109.5;
+    const hotelW = isChampsAdjacent ? 20.5 : isFochAdjacent ? 21.5 : 26.5;
+    const hotelD = 13.5;
+    const hotelH = 19.6;
 
     const hg = new THREE.Group();
     hg.position.set(inX * hotelR, 0, inZ * hotelR);
     hg.rotation.y = Math.PI - midTheta;
     envGroup.add(hg);
 
-    // Trottoir sectoriel propre sous l'Hôtel (y = 0,04 -> sous la chaussée des avenues à 0,16)
-    addBox(hotelW + 5.5, 0.14, hotelD + 12, 0, 0.04, 2.0, matSidewalkStone, { cast: false, parent: hg });
-    // Corps néoclassique Hittorff + toiture mansardée d'ardoise + souches de cheminées
-    addBox(hotelW, hotelH, hotelD, 0, hotelH * 0.5 + 0.08, 0, matMarechaux, { parent: hg });
-    addBox(hotelW + 0.6, 0.55, hotelD + 0.6, 0, hotelH + 0.3, 0, matStoneLight, { cast: false, parent: hg });
-    addBox(hotelW - 1.2, 3.8, hotelD - 1.2, 0, hotelH + 2.35, 0, matSlateRoof, { parent: hg });
-    [-hotelW * 0.3, 0, hotelW * 0.3].forEach((cx) => {
-      addBox(1.5, 1.9, 1.2, cx, hotelH + 4.8, 0, matStone, { cast: false, parent: hg });
+    // Trottoir sectoriel & Jardin d'honneur fleuri côté rond-point (localZ = +7 .. +19 -> r = 90.5 .. 102.5)
+    addBox(hotelW + 5.2, 0.16, 33.5, 0, 0.04, 2.5, matSidewalkStone, { cast: false, parent: hg });
+    addBox(hotelW - 1.5, 0.2, 9.6, 0, 0.11, hotelD * 0.5 + 5.6, matGardenLawn, { cast: false, parent: hg });
+    // Muret bas + grille en fer forgé à pointes dorées bordant le rond-point
+    addBox(hotelW + 1.0, 0.65, 0.42, 0, 0.35, hotelD * 0.5 + 10.8, matStoneLight, { parent: hg });
+    addBox(hotelW + 1.0, 1.15, 0.14, 0, 1.25, hotelD * 0.5 + 10.8, matIronRail, { parent: hg });
+    addBox(hotelW + 1.0, 0.16, 0.18, 0, 1.85, hotelD * 0.5 + 10.8, matGold, { cast: false, parent: hg });
+
+    // 2 arbres dans chaque jardin d'honneur (instanciés)
+    [-hotelW * 0.28, hotelW * 0.28].forEach((tx) => {
+      const worldPtX = inX * (hotelR - (hotelD * 0.5 + 5.6)) + tanX * tx;
+      const worldPtZ = inZ * (hotelR - (hotelD * 0.5 + 5.6)) + tanZ * tx;
+      gardenTrees.push([worldPtX, worldPtZ]);
     });
 
-    // Candélabre sur le trottoir du rond-point devant chaque Hôtel des Maréchaux
+    // Corps principal Hittorff + deux ailes en retour vers Rue de Presbourg/Tilsitt formant cour
+    addBox(hotelW, hotelH, hotelD, 0, hotelH * 0.5 + 0.08, 0, matMarechaux, { parent: hg });
+    addBox(hotelW + 0.6, 0.55, hotelD + 0.6, 0, hotelH + 0.3, 0, matStoneLight, { cast: false, parent: hg });
+    addBox(hotelW - 1.0, 3.8, hotelD - 1.0, 0, hotelH + 2.35, 0, matSlateRoof, { parent: hg });
+    [-hotelW * 0.3, 0, hotelW * 0.3].forEach((cx) => {
+      addBox(1.5, 1.9, 1.2, cx, hotelH + 4.8, 0, matStone, { cast: false, parent: hg });
+      // Lucarnes en zinc sur la toiture mansardée
+      addBox(1.65, 1.95, 1.35, cx, hotelH + 1.85, hotelD * 0.45, matSlateRoof, { cast: false, parent: hg });
+    });
+
+    // Ailes latérales en retour encadrant la cour arrière
+    const wingLen = isChampsAdjacent ? 8.5 : 13.5;
+    const wingW = 6.2;
+    [-1, 1].forEach((ws) => {
+      const wx = ws * (hotelW * 0.5 - wingW * 0.5);
+      const wz = -(hotelD * 0.5 + wingLen * 0.5 - 0.5);
+      addBox(wingW, hotelH - 0.5, wingLen, wx, (hotelH - 0.5) * 0.5 + 0.08, wz, matMarechaux, { parent: hg });
+      addBox(wingW - 0.6, 3.2, wingLen - 0.6, wx, hotelH + 1.5, wz, matSlateRoof, { parent: hg });
+    });
+
     const lampR = 86.2;
     lampPositions.push([inX * lampR - tanX * 3.5, 0.12, inZ * lampR - tanZ * 3.5]);
     lampPositions.push([inX * lampR + tanX * 3.5, 0.12, inZ * lampR + tanZ * 3.5]);
   }
 
-  // E. Candélabres parisiens instanciés (2 draw calls)
+  // E. Candélabres & Arbres des Jardins d'Honneur instanciés (4 draw calls)
   const polesInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.11, 0.19, 4.6, 7), matLampPost, lampPositions.length);
   const globesInst = new THREE.InstancedMesh(new THREE.SphereGeometry(0.42, 10, 8), matLampGlow, lampPositions.length);
+  const gTrunkMat = new THREE.MeshStandardMaterial({ color: 0x524030, roughness: 0.92 });
+  const gLeafMat = new THREE.MeshStandardMaterial({ color: 0x4d7b3b, roughness: 0.84 });
+  const gTrunksInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.18, 0.28, 3.8, 6), gTrunkMat, gardenTrees.length);
+  const gCrownsInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(2.35, 1), gLeafMat, gardenTrees.length);
+
   const td = new THREE.Object3D();
   lampPositions.forEach(([lx, ly, lz], i) => {
     td.position.set(lx, ly + 2.3, lz);
@@ -977,13 +1393,26 @@ export function buildArcDeTriompheMonument(scene) {
     td.updateMatrix();
     globesInst.setMatrixAt(i, td.matrix);
   });
+  gardenTrees.forEach(([gx, gz], i) => {
+    const sc = 0.85 + ((i * 11) % 5) * 0.06;
+    td.position.set(gx, 1.9 * sc, gz);
+    td.rotation.set(0, (i * 1.1) % 6.28, 0);
+    td.scale.set(sc, sc, sc);
+    td.updateMatrix();
+    gTrunksInst.setMatrixAt(i, td.matrix);
+    td.position.set(gx, 4.8 * sc, gz);
+    td.scale.set(sc * 1.1, sc * 0.88, sc * 1.1);
+    td.updateMatrix();
+    gCrownsInst.setMatrixAt(i, td.matrix);
+  });
   polesInst.instanceMatrix.needsUpdate = true;
   globesInst.instanceMatrix.needsUpdate = true;
-  envGroup.add(polesInst, globesInst);
+  gTrunksInst.instanceMatrix.needsUpdate = true;
+  gCrownsInst.instanceMatrix.needsUpdate = true;
 
-  // Fusion haute performance par matériau (~15 draw calls pour tout l'Arc & Place de l'Étoile !)
   mergeStaticGroupByMaterial(archGroup);
   mergeStaticGroupByMaterial(envGroup);
+  envGroup.add(polesInst, globesInst, gTrunksInst, gCrownsInst);
 
   /**
    * ==========================================================================
@@ -1180,12 +1609,16 @@ export function buildArcDeTriompheMonument(scene) {
   let elapsed = 0;
   let currentLod = 0;
 
-  function setLodLevel(level) {
+  function setLodLevel(level, camDist = 200) {
     currentLod = level;
-    // L'Arc et sa place restent visibles à toute distance dans la skyline ; seules les flammes & micro-détails se réduisent au loin
+    // L'Arc (50 m) reste visible à toute distance dans la skyline ; seul le mobilier de place s'efface au-delà de 2,4 km
+    envGroup.visible = camDist < 2400;
     flameGroup.visible = level < 2;
+    vaultLight.visible = level === 0;
     polesInst.visible = level === 0;
     globesInst.visible = level === 0;
+    gTrunksInst.visible = level < 2;
+    gCrownsInst.visible = level < 2;
   }
 
   function update(dt, nightFactor = 0.1) {
@@ -1208,16 +1641,19 @@ export function buildArcDeTriompheMonument(scene) {
       if (useFlameLight) {
         flameLight.intensity = 15 + f1 * 9 + nightFactor * 16;
       }
+      vaultLight.intensity = useFlameLight ? 12 + nightFactor * 16 : 0;
     } else {
       flameLight.visible = false;
+      vaultLight.visible = false;
     }
 
-    // 2. Illumination nocturne dorée de l'Arc de Triomphe & des candélabres de l'Étoile
+    // 2. Illumination nocturne dorée de l'Arc de Triomphe, fenêtres des Maréchaux & candélabres de l'Étoile
     const glow = Math.max(0, (nightFactor - 0.26) / 0.74);
     nightLitStoneMats.forEach((mat) => {
       mat.emissive.setHex(0xd49a4c);
       mat.emissiveIntensity = glow * 0.38;
     });
+    matMarechaux.emissiveIntensity = 0.04 + glow * 0.92;
     matLampGlow.emissiveIntensity = 0.22 + glow * 1.45;
   }
 

@@ -89,6 +89,10 @@ export function createTourSystem({
   }
 
   let audioManifest = null;
+  let photoManifest = null;
+  let currentPhotoStepKey = null;
+  let currentStepPhotos = [];
+  let currentPhotoIndex = 0;
   let preferredFrenchVoice = null;
   let isMaleVoiceSelected = false;
   let speechToken = 0;
@@ -112,6 +116,143 @@ export function createTourSystem({
       .catch(() => {
         // Fallback Web Speech API silencieux si manifeste absent
       });
+  }
+
+  function reloadPhotoManifest() {
+    if (typeof fetch !== 'function') return;
+    fetch(`./photos/manifest.json?t=${Date.now()}`, { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.steps) {
+          photoManifest = data;
+          if (ui.poiCard && ui.poiCard.open && currentPhotoStepKey) {
+            renderChapterPhotos(currentPhotoStepKey, { preserveIndex: true });
+          }
+        }
+      })
+      .catch(() => {
+        // Ignore si manifeste photo indisponible
+      });
+  }
+
+  reloadPhotoManifest();
+
+  function getStepPhotos(stepKey) {
+    if (!stepKey || !photoManifest || !photoManifest.steps) return [];
+    const list = photoManifest.steps[stepKey];
+    return Array.isArray(list) ? list.filter((p) => p && p.file) : [];
+  }
+
+  function syncLightboxPhoto() {
+    if (!ui.photoLightbox || !ui.photoLightbox.open || !currentStepPhotos.length) return;
+    const item = currentStepPhotos[currentPhotoIndex] || currentStepPhotos[0];
+    const rel = String(item.file || '').replace(/^\.?\//, '');
+    if (ui.lightboxImg) {
+      ui.lightboxImg.src = `./${rel}`;
+      ui.lightboxImg.alt = item.caption || (ui.cardTitle ? ui.cardTitle.textContent : 'Photo Paris 3D');
+    }
+    if (ui.lightboxBadge) {
+      const badge = (item.badge || '').trim();
+      ui.lightboxBadge.textContent = badge;
+      ui.lightboxBadge.hidden = !badge;
+    }
+    if (ui.lightboxCaption) {
+      ui.lightboxCaption.textContent = item.caption || (ui.cardTitle ? ui.cardTitle.textContent : '');
+    }
+    if (ui.lightboxCredit) {
+      ui.lightboxCredit.textContent = item.credit || '';
+      ui.lightboxCredit.hidden = !item.credit;
+    }
+    const multi = currentStepPhotos.length > 1;
+    if (ui.lightboxPrev) ui.lightboxPrev.hidden = !multi;
+    if (ui.lightboxNext) ui.lightboxNext.hidden = !multi;
+    if (ui.lightboxCounter) {
+      ui.lightboxCounter.hidden = !multi;
+      ui.lightboxCounter.textContent = `${currentPhotoIndex + 1} / ${currentStepPhotos.length}`;
+    }
+  }
+
+  function renderActiveCardPhoto() {
+    if (!ui.poiCardMedia || !ui.poiCardImg) return;
+    if (!currentStepPhotos.length) {
+      ui.poiCardMedia.hidden = true;
+      ui.poiCardImg.removeAttribute('src');
+      if (ui.poiCardCredit) ui.poiCardCredit.textContent = '';
+      return;
+    }
+    if (currentPhotoIndex < 0 || currentPhotoIndex >= currentStepPhotos.length) {
+      currentPhotoIndex = 0;
+    }
+    const item = currentStepPhotos[currentPhotoIndex];
+    const rel = String(item.file || '').replace(/^\.?\//, '');
+    ui.poiCardImg.src = `./${rel}`;
+    ui.poiCardImg.alt = item.caption || (ui.cardTitle ? ui.cardTitle.textContent : 'Photo du point d’intérêt');
+
+    if (ui.poiPhotoBadge) {
+      const badge = (item.badge || '').trim();
+      ui.poiPhotoBadge.textContent = badge;
+      ui.poiPhotoBadge.hidden = !badge;
+    }
+    const multi = currentStepPhotos.length > 1;
+    if (ui.poiPhotoPrev) ui.poiPhotoPrev.hidden = !multi;
+    if (ui.poiPhotoNext) ui.poiPhotoNext.hidden = !multi;
+    if (ui.poiPhotoCounter) {
+      ui.poiPhotoCounter.hidden = !multi;
+      ui.poiPhotoCounter.textContent = `${currentPhotoIndex + 1} / ${currentStepPhotos.length}`;
+    }
+    if (ui.poiCardCredit) {
+      const creditParts = [item.caption, item.credit].filter(Boolean);
+      ui.poiCardCredit.textContent = creditParts.join(' — ');
+      ui.poiCardCredit.hidden = creditParts.length === 0;
+    }
+    ui.poiCardMedia.hidden = false;
+    syncLightboxPhoto();
+  }
+
+  function preloadNextStepPhoto(stepKey) {
+    if (!stepKey || !currentMonument || typeof Image === 'undefined') return;
+    let nextKey = null;
+    if (stepKey.endsWith('/intro') && currentPois.length > 0) {
+      nextKey = `${currentMonument.id}/${currentPois[0].id}`;
+    } else if (state.activeIndex >= 0 && state.activeIndex + 1 < currentPois.length) {
+      nextKey = `${currentMonument.id}/${currentPois[state.activeIndex + 1].id}`;
+    }
+    if (!nextKey) return;
+    const nextPhotos = getStepPhotos(nextKey);
+    if (nextPhotos.length > 0) {
+      const img = new Image();
+      img.src = `./${String(nextPhotos[0].file).replace(/^\.?\//, '')}`;
+    }
+  }
+
+  function renderChapterPhotos(stepKey, { preserveIndex = false } = {}) {
+    currentPhotoStepKey = stepKey;
+    currentStepPhotos = getStepPhotos(stepKey);
+    if (!preserveIndex || currentPhotoIndex >= currentStepPhotos.length) {
+      currentPhotoIndex = 0;
+    }
+    renderActiveCardPhoto();
+    preloadNextStepPhoto(stepKey);
+  }
+
+  function stepPhoto(delta) {
+    if (currentStepPhotos.length <= 1) return;
+    currentPhotoIndex = (currentPhotoIndex + delta + currentStepPhotos.length) % currentStepPhotos.length;
+    renderActiveCardPhoto();
+  }
+
+  function openPhotoLightbox() {
+    if (!ui.photoLightbox || !currentStepPhotos.length) return;
+    if (!ui.photoLightbox.open) {
+      ui.photoLightbox.showModal();
+    }
+    syncLightboxPhoto();
+  }
+
+  function closePhotoLightbox() {
+    if (ui.photoLightbox && ui.photoLightbox.open) {
+      ui.photoLightbox.close();
+    }
   }
 
   function getCustomTrack(audioKey) {
@@ -543,7 +684,7 @@ export function createTourSystem({
     });
   }
 
-  function showChapterCard(chapter, badgeText, showFpsBtn = true) {
+  function showChapterCard(chapter, badgeText, showFpsBtn = true, stepKey = null) {
     ui.cardIndex.textContent = badgeText;
     ui.cardEra.textContent = chapter.era;
     ui.cardTitle.textContent = chapter.title;
@@ -556,13 +697,21 @@ export function createTourSystem({
     if (ui.cardPrevBtn) ui.cardPrevBtn.hidden = currentPois.length === 0;
     if (ui.cardNextBtn) ui.cardNextBtn.hidden = currentPois.length === 0;
 
+    const resolvedKey = stepKey || (
+      currentMonument
+        ? (state.activeIndex === -2 ? `${currentMonument.id}/intro` : `${currentMonument.id}/${chapter.id}`)
+        : null
+    );
+    renderChapterPhotos(resolvedKey);
+
     if (!ui.poiCard.open) {
       ui.poiCard.show();
     }
   }
 
   function showPoiCard(poi, index) {
-    showChapterCard(poi, `Étape ${index + 1} / ${currentPois.length}`, true);
+    const key = currentMonument ? `${currentMonument.id}/${poi.id}` : null;
+    showChapterCard(poi, `Étape ${index + 1} / ${currentPois.length}`, true, key);
   }
 
   function getPoiSpeechText(poi, index, total = currentPois.length) {
@@ -599,6 +748,8 @@ export function createTourSystem({
       'saint-eustache': "de l'Église Saint-Eustache",
       'tour-eiffel': 'de la Tour Eiffel',
       'arc-de-triomphe': "de l'Arc de Triomphe de l'Étoile",
+      'palais-garnier': 'du Palais Garnier',
+      'notre-dame': 'de la Cathédrale Notre-Dame de Paris',
     };
     let deMonName = byId[monument.id];
     if (!deMonName) {
@@ -966,6 +1117,36 @@ export function createTourSystem({
       }
     });
   }
+
+  if (ui.poiPhotoPrev) ui.poiPhotoPrev.addEventListener('click', () => stepPhoto(-1));
+  if (ui.poiPhotoNext) ui.poiPhotoNext.addEventListener('click', () => stepPhoto(1));
+  if (ui.btnPoiZoom) ui.btnPoiZoom.addEventListener('click', openPhotoLightbox);
+  if (ui.poiCardImg) ui.poiCardImg.addEventListener('click', openPhotoLightbox);
+
+  if (ui.lightboxPrev) ui.lightboxPrev.addEventListener('click', () => stepPhoto(-1));
+  if (ui.lightboxNext) ui.lightboxNext.addEventListener('click', () => stepPhoto(1));
+  if (ui.lightboxClose) ui.lightboxClose.addEventListener('click', closePhotoLightbox);
+  if (ui.photoLightbox) {
+    ui.photoLightbox.addEventListener('click', (e) => {
+      if (e.target === ui.photoLightbox) closePhotoLightbox();
+    });
+  }
+  window.addEventListener('keydown', (e) => {
+    if (!ui.photoLightbox || !ui.photoLightbox.open) return;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      e.stopPropagation();
+      stepPhoto(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      e.stopPropagation();
+      stepPhoto(1);
+    }
+  });
+  window.addEventListener('focus', reloadPhotoManifest);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) reloadPhotoManifest();
+  });
 
   window.addEventListener('beforeunload', () => {
     if (narAudio) {

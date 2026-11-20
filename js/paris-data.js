@@ -31,17 +31,25 @@ export function getParisElevation(x, z) {
   const dEiffel = Math.hypot(x - (-3694), z - 556);
   if (dEiffel < 550) return 0;
 
+  const dGarnier = Math.hypot(x - (-980), z - (-956));
+  if (dGarnier < 260) return 0;
+
   // Atténuation douce près de la Seine pour que les quais restent plats
   const dSeine = distanceToPolyline(x, z, SEINE_POINTS);
   const seineFlatFactor = THREE.MathUtils.smoothstep(dSeine, 120, 320);
 
-  // 1. Butte Montmartre (-139, -2591) : +90m
-  const dMontmartreSq = (x + 139) ** 2 + (z + 2591) ** 2;
-  const hMontmartre = 90 * Math.exp(-dMontmartreSq / (2 * 440 ** 2));
+  // 1. Butte Montmartre (-139, -2591) : plateau sommital (+90 m, Sacré-Cœur & Place du Tertre) + versant Sud pour Square Louise-Michel
+  const mx = x + 139;
+  const mz = z + 2591;
+  const southFactor = 1.0 + 0.45 * THREE.MathUtils.smoothstep(mz, 56, 260);
+  const dMontmartre = Math.hypot((mx + 22) * 0.88, (mz + 2) * southFactor);
+  const rMontmartreEff = Math.max(0, dMontmartre - 64);
+  const hMontmartre = 90 * Math.exp(-Math.pow(rMontmartreEff / 430, 1.55));
 
-  // 2. Montagne Sainte-Geneviève (+102, +1913) : +26m
-  const dGenevieveSq = (x - 102) ** 2 + (z - 1913) ** 2;
-  const hGenevieve = 26 * Math.exp(-dGenevieveSq / (2 * 380 ** 2));
+  // 2. Montagne Sainte-Geneviève (+102, +1913) : plateau sommital nivelé (+26 m sur rayon 98 m pour la Place du Panthéon)
+  const dGenevieve = Math.hypot(x - 102, z - 1913);
+  const rGenevieveEff = Math.max(0, dGenevieve - 98);
+  const hGenevieve = 26 * Math.exp(-(rGenevieveEff * rGenevieveEff) / (2 * 320 ** 2));
 
   // 3. Butte de l'Étoile (-3658, -1156) : plateau nivelé +18m sur rayon 142m pour le Rond-Point & Hôtels des Maréchaux
   const dEtoile = Math.hypot(x + 3658, z + 1156);
@@ -53,11 +61,12 @@ export function getParisElevation(x, z) {
   const hChaillot = 20 * Math.exp(-dChaillotSq / (2 * 300 ** 2));
 
   const raw = hMontmartre + hGenevieve + hEtoile + hChaillot;
-  // Atténuation douce aux abords de Saint-Eustache & Tour Eiffel
+  // Atténuation douce aux abords de Saint-Eustache, Tour Eiffel & Palais Garnier
   const eustacheFactor = THREE.MathUtils.smoothstep(dEustache, 320, 620);
   const eiffelFactor = THREE.MathUtils.smoothstep(dEiffel, 550, 920);
+  const garnierFactor = THREE.MathUtils.smoothstep(dGarnier, 260, 480);
 
-  return raw * seineFlatFactor * eustacheFactor * eiffelFactor;
+  return raw * seineFlatFactor * eustacheFactor * eiffelFactor * garnierFactor;
 }
 
 /**
@@ -67,8 +76,8 @@ export function getParisElevation(x, z) {
 const SEINE_GPS = [
   [48.8360, 2.3820], // Bercy / Tolbiac
   [48.8425, 2.3715], // Pont d'Austerlitz
-  [48.8495, 2.3610], // Sully / Pointe Est Île Saint-Louis
-  [48.8535, 2.3530], // Île de la Cité / Notre-Dame
+  [48.8504, 2.3598], // Sully / Île Saint-Louis
+  [48.8530, 2.3502], // Île de la Cité / Notre-Dame (Bras Marie & Petit Bras)
   [48.8572, 2.3412], // Pont Neuf
   [48.8588, 2.3340], // Pont des Arts / Louvre
   [48.8615, 2.3220], // Pont Royal / Solférino
@@ -111,8 +120,8 @@ export function distanceToPolyline(x, z, pts) {
  */
 export const BRIDGES = [
   { name: 'Pont d\'Austerlitz',  lat: 48.8453, lon: 2.3652, width: 22, span: 158 },
-  { name: 'Pont Sully',          lat: 48.8505, lon: 2.3586, width: 20, span: 195 },
-  { name: 'Pont Neuf',           lat: 48.8571, lon: 2.3414, width: 21, span: 230 },
+  { name: 'Pont Sully',          lat: 48.8505, lon: 2.3586, width: 20, span: 285 },
+  { name: 'Pont Neuf',           lat: 48.8571, lon: 2.3414, width: 21, span: 265 },
   { name: 'Pont des Arts',       lat: 48.8584, lon: 2.3375, width: 11, span: 156, pedestrian: true },
   { name: 'Pont de la Concorde', lat: 48.8634, lon: 2.3196, width: 25, span: 156 },
   { name: 'Pont Alexandre-III',  lat: 48.8639, lon: 2.3136, width: 40, span: 162, ornate: true },
@@ -181,15 +190,18 @@ const RAW_MONUMENTS = [
     name: 'Cathédrale Notre-Dame de Paris',
     shortName: 'Notre-Dame',
     district: '4e arr. • Île de la Cité',
-    era: '1163 – 1345 • Gothique classique',
-    status: 'lod',
+    era: '1163 – 1345 & 2024 • Gothique & Viollet-le-Duc',
+    status: 'detailed',
     lat: 48.8530,
     lon: 2.3499,
-    groundY: 0,
-    shadowRadius: 150,
-    exclusionRadius: 92,
+    groundY: 0.45,
+    defaultCameraPos: new THREE.Vector3(244, 34, 1086),
+    defaultTarget: new THREE.Vector3(352, 26, 1151),
+    orbit360Config: { center: new THREE.Vector3(358, 28, 1156), rx: 148, rz: 132, baseHeight: 58, duration: 34, startAngle: Math.PI * 0.88 },
+    shadowRadius: 165,
+    exclusionRadius: 165,
     summary:
-      "Symbole gothique de Paris posé sur l'Île de la Cité, reconnaissable à ses deux tours occidentales de 69 mètres, ses arcs-boutants du chœur et sa flèche culminant à 96 mètres.",
+      "Chef-d'œuvre gothique posé sur l'Île de la Cité et rouvert en décembre 2024 : façade aux trois portails sculptés, tours de 69 m, trois grandes rosaces du XIIIe siècle, arcs-boutants du chœur et flèche de Viollet-le-Duc à 96 m.",
   },
   {
     id: 'louvre',
@@ -226,13 +238,16 @@ const RAW_MONUMENTS = [
     name: 'Palais Garnier (Opéra)',
     shortName: 'Palais Garnier',
     district: '9e arr. • Place de l’Opéra',
-    era: '1861 – 1875 • Second Empire',
-    status: 'lod',
+    era: '1861 – 1875 • Second Empire (Charles Garnier)',
+    status: 'detailed',
     lat: 48.8720,
     lon: 2.3316,
     groundY: 0,
-    shadowRadius: 140,
-    exclusionRadius: 96,
+    defaultCameraPos: new THREE.Vector3(-902, 34, -772),
+    defaultTarget: new THREE.Vector3(-976, 22, -938),
+    orbit360Config: { center: new THREE.Vector3(-980, 26, -952), rx: 142, rz: 148, baseHeight: 54, duration: 32, startAngle: 1.18 },
+    shadowRadius: 165,
+    exclusionRadius: 175,
     summary:
       "Chef-d'œuvre éclectique de Charles Garnier, couronné d'une grande coupole de cuivre patiné vert-de-gris et de groupes sculptés dorés au cœur des Grands Boulevards.",
   },
@@ -242,14 +257,17 @@ const RAW_MONUMENTS = [
     shortName: 'Le Panthéon',
     district: '5e arr. • Montagne Sainte-Geneviève',
     era: '1758 – 1790 • Néoclassicisme (Soufflot)',
-    status: 'lod',
+    status: 'detailed',
     lat: 48.8462,
     lon: 2.3464,
     groundY: 26,
-    shadowRadius: 140,
-    exclusionRadius: 92,
+    defaultCameraPos: new THREE.Vector3(-24, 62, 1897),
+    defaultTarget: new THREE.Vector3(98, 60, 1912),
+    orbit360Config: { center: new THREE.Vector3(102, 54, 1913), rx: 142, rz: 138, baseHeight: 82, duration: 34, startAngle: 2.62 },
+    shadowRadius: 175,
+    exclusionRadius: 145,
     summary:
-      "Nécropole laïque des grands personnages de la République juchée sur la Montagne Sainte-Geneviève, dotée d'un péristyle corinthien et d'un dôme à colonnade abritant le pendule de Foucault.",
+      "Nécropole laïque des grands personnages de la République juchée sur la Montagne Sainte-Geneviève : péristyle corinthien à 22 colonnes, fronton de David d'Angers, dôme à 32 colonnes de 83 m, intérieur visitable avec Pendule de Foucault animé, Place du Panthéon & Saint-Étienne-du-Mont.",
   },
   {
     id: 'grand-palais',
@@ -286,18 +304,21 @@ const RAW_MONUMENTS = [
   },
   {
     id: 'sacre-coeur',
-    name: 'Basilique du Sacré-Cœur',
+    name: 'Basilique du Sacré-Cœur de Montmartre',
     shortName: 'Sacré-Cœur',
     district: '18e arr. • Butte Montmartre',
-    era: '1875 – 1914 • Romano-byzantin',
-    status: 'lod',
+    era: '1875 – 1914 • Romano-byzantin (Paul Abadie)',
+    status: 'detailed',
     lat: 48.8867,
     lon: 2.3431,
     groundY: 90,
-    shadowRadius: 140,
-    exclusionRadius: 102,
+    defaultCameraPos: new THREE.Vector3(-69, 126, -2425),
+    defaultTarget: new THREE.Vector3(-139, 122, -2592),
+    orbit360Config: { center: new THREE.Vector3(-139, 124, -2595), rx: 148, rz: 158, baseHeight: 156, duration: 34, startAngle: 0.92 },
+    shadowRadius: 175,
+    exclusionRadius: 155,
     summary:
-      "Perchée à 130 m d'altitude au sommet de la butte Montmartre, sa silhouette en travertin blanc qui blanchit sous la pluie domine tout Paris de ses dômes ovoïdes.",
+      "Perchée à 130 m d'altitude au sommet de la butte Montmartre, sa silhouette en travertin blanc de Château-Landon couronnée de cinq dômes ovoïdes (83 m) et du campanile de la Savoyarde (84 m) surplombe le square Louise-Michel, le funiculaire et la place du Tertre.",
   },
   {
     id: 'fondation-lv',
