@@ -1,0 +1,147 @@
+{
+  "voiceName": "Laurent",
+  "voiceId": "k2OV0aefDPCq8foI",
+  "generatedAt": "2026-11-20T07:14:15+00:00",
+  "tracks": {
+    "saint-eustache/intro": {
+      "file": "audio/laurent/saint-eustache/intro.mp3",
+      "duration": 66.05,
+      "sha1": "ab476d02d48290a4cb2f0ce4358816ed5c22681c"
+    },
+    "saint-eustache/facade-occidentale": {
+      "file": "audio/laurent/saint-eustache/facade-occidentale.mp3",
+      "duration": 37.27,
+      "sha1": "c905b32a41433181f8cdbd47ff35731db1d3a808"
+    },
+    "saint-eustache/grande-nef": {
+      "file": "audio/laurent/saint-eustache/grande-nef.mp3",
+      "duration": 43.41,
+      "sha1": "dfecc666061d8b6ceb3f47ce9d864919254864b5"
+    },
+    "saint-eustache/grand-orgue": {
+      "file": "audio/laurent/saint-eustache/grand-orgue.mp3",
+      "duration": 44.93,
+      "sha1": "ce3417323941568bde8990d11bfef648fa02f875"
+    },
+    "saint-eustache/chapelle-vierge": {
+      "file": "audio/laurent/saint-eustache/chapelle-vierge.mp3",
+      "duration": 38.57,
+      "sha1": "f18823ef74dd4071077fef0c74a1d88efea9f0b0"
+    },
+    "saint-eustache/tombeau-colbert": {
+      "file": "audio/laurent/saint-eustache/tombeau-colbert.mp3",
+      "duration": 34.59,
+      "sha1": "a2f98d5293777119f5529f8a5837820be3eece96"
+    },
+    "saint-eustache/keith-haring": {
+      "file": "audio/laurent/saint-eustache/keith-haring.mp3",
+      "duration": 35.87,
+      "sha1": "4ee5a6cc36b3b94a8faab42d60019eb3d36aa409"
+    },
+    "saint-eustache/transept-sud-meridien": {
+      "file": "audio/laurent/saint-eustache/transept-sud-meridien.mp3",
+      "duration": 35.23,
+      "sha1": "87887dc29ed03c6c551c978aa261cd1bea6901f7"
+    },
+    "saint-eustache/finale": {
+      "file": "audio/laurent/saint-eustache/finale.mp3",
+      "duration": 10.06,
+      "sha1": "c54ed8ff65bfbfba38b1325b1266979660321f7d"
+    },
+    "tour-eiffel/intro": {
+      "file": "audio/laurent/tour-eiffel/intro.mp3",
+      "duration": 44.42,
+      "sha1": "2deacc8a42ad967cd84f925095a420c2b3606407"
+    },
+    "tour-eiffel/eiffel-parvis-piliers": {
+      "file": "audio/laurent/tour-eiffel/eiffel-parvis-piliers.mp3",
+      "duration": 28.16,
+      "sha1": "3154fd93ac32b1727d74ee361f3b474a01d3c32c"
+    },
+    "tour-eiffel/eiffel-premier-etage": {
+      "file": "audio/laurent/tour-eiffel/eiffel-premier-etage.mp3",
+      "duration": 31.0,
+      "sha1": "3b5a0a9b685b84430fd7c2f5bd34a44fe2cf6825"
+    },
+    "tour-eiffel/eiffel-ascenseurs": {
+      "file": "audio/laurent/tour-eiffel/eiffel-ascenseurs.mp3",
+      "duration": 31.93,
+      "sha1": "7241e219c7ba5d9bdec747c248ebd6d2a3b6354f"
+    },
+    "tour-eiffel/eiffel-deuxieme-etage": {
+      "file": "audio/laurent/tour-eiffel/eiffel-deuxieme-etage.mp3",
+      "duration": 29.25,
+      "sha1": "6964c1b47a71f119c82573dc28a261acbc3b11f7"
+    },
+    "tour-eiffel/eiffel-sommet": {
+      "file": "audio/laurent/tour-eiffel/eiffel-sommet.mp3",
+      "duration": 30.78,
+      "sha1": "5ce55617e5197d0820fd9081943721ae2ca4a4f7"
+    },
+    "tour-eiffel/eiffel-champ-de-mars": {
+      "file": "audio/laurent/tour-eiffel/eiffel-champ-de-mars.mp3",
+      "duration": 29.33,
+      "sha1": "d0fdb8e37ceccb8cda47bd96e885e862cc9506cc"
+    },
+    "tour-eiffel/eiffel-trocadero-iena": {
+      "file": "audio/laurent/tour-eiffel/eiffel-trocadero-iena.mp3",
+      "duration": 29.7,
+      "sha1": "d9acbc5c8c826784b91f0f5e31dd275cdbe4dbe2"
+    },
+    "tour-eiffel/finale": {
+      "file": "audio/laurent/tour-eiffel/finale.mp3",
+      "duration": 9.15,
+      "sha1": "a7c0e557ff7606f083196185eaba975faf65db8b"
+    },
+    "arc-de-triomphe/intro": {
+      "file": "audio/laurent/arc-de-triomphe/intro.mp3",
+      "duration": 51.05,
+      "sha1": "05a5086a21e3c758f4cd8e3a0ae6aa39d717babe"
+    },
+    "arc-de-triomphe/arc-facade-champs": {
+      "file": "audio/laurent/arc-de-triomphe/arc-facade-champs.mp3",
+      "duration": 26.21,
+      "sha1": "150ec55c1adb9a73c3c897d1e2679596d1619e99"
+    },
+    "arc-de-triomphe/arc-marseillaise": {
+      "file": "audio/laurent/arc-de-triomphe/arc-marseillaise.mp3",
+      "duration": 28.91,
+      "sha1": "d5447929860478d126df6192b4016ceabd14fd69"
+    },
+    "arc-de-triomphe/arc-soldat-inconnu": {
+      "file": "audio/laurent/arc-de-triomphe/arc-soldat-inconnu.mp3",
+      "duration": 30.99,
+      "sha1": "728a70a0d1f499b9c9960fed1444d767430b82f8"
+    },
+    "arc-de-triomphe/arc-grande-voute": {
+      "file": "audio/laurent/arc-de-triomphe/arc-grande-voute.mp3",
+      "duration": 29.84,
+      "sha1": "beb372344481167f88692cbf0e85cb574289afc6"
+    },
+    "arc-de-triomphe/arc-frise-boucliers": {
+      "file": "audio/laurent/arc-de-triomphe/arc-frise-boucliers.mp3",
+      "duration": 30.18,
+      "sha1": "cf5103322c2ee6459f7dc27c74d70829aff95bc9"
+    },
+    "arc-de-triomphe/arc-terrasse-50m": {
+      "file": "audio/laurent/arc-de-triomphe/arc-terrasse-50m.mp3",
+      "duration": 33.46,
+      "sha1": "628d0e6226e5b9b8a37f13a838598c20da452c80"
+    },
+    "arc-de-triomphe/arc-place-etoile": {
+      "file": "audio/laurent/arc-de-triomphe/arc-place-etoile.mp3",
+      "duration": 32.87,
+      "sha1": "cf875eb886c356f083394a275d7a824e46e3a42a"
+    },
+    "arc-de-triomphe/arc-champs-elysees": {
+      "file": "audio/laurent/arc-de-triomphe/arc-champs-elysees.mp3",
+      "duration": 37.49,
+      "sha1": "413be53f6b5afc5351446406a8b4e36545ca50c3"
+    },
+    "arc-de-triomphe/finale": {
+      "file": "audio/laurent/arc-de-triomphe/finale.mp3",
+      "duration": 10.17,
+      "sha1": "f8d5d564dbb1c10917d887723c56c817e3d2e1e2"
+    }
+  }
+}

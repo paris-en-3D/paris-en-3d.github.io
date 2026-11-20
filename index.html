@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paris 3D — Explorateur Architectural à l’Échelle Réelle</title>
+  <meta name="description" content="Exploration 3D temps réel de Paris à l'échelle 1:1 : Église Saint-Eustache, Tour Eiffel, la Seine, cycle solaire dynamique et visites audio-guidées." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101522'/%3E%3Cpath d='M32 10 L37.5 26.5 L54 32 L37.5 37.5 L32 54 L26.5 37.5 L10 32 L26.5 26.5 Z' fill='%23e5b357'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Conteneur WebGL plein écran -->
+  <main id="viewport" aria-label="Scène 3D interactive de Paris">
+    <canvas id="scene-canvas"></canvas>
+    <div id="poi-hover-tooltip" class="poi-tooltip" hidden role="status" aria-live="polite"></div>
+    <div id="crosshair" class="crosshair" hidden aria-hidden="true"></div>
+  </main>
+
+  <!-- Écran de chargement léger -->
+  <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-card glass-panel">
+      <div class="loading-crest" aria-hidden="true">✦</div>
+      <h1>Paris 3D Explorateur</h1>
+      <p class="loading-sub">Échelle réelle 1:1 • Saint-Eustache, Tour Eiffel &amp; Arc de Triomphe</p>
+      <div class="loading-bar" aria-hidden="true">
+        <div id="loading-progress" class="loading-bar-fill"></div>
+      </div>
+      <p id="loading-status" class="loading-status">Génération de Paris, de la Seine et des monuments…</p>
+    </div>
+  </div>
+
+  <!-- Bandeau supérieur discret (HUD) -->
+  <header class="top-hud glass-panel" role="banner">
+    <div class="hud-brand">
+      <button
+        type="button"
+        id="btn-toggle-sidebar"
+        class="icon-btn"
+        aria-expanded="true"
+        aria-controls="tour-sidebar"
+        title="Afficher ou masquer la visite guidée"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+      </button>
+      <div class="brand-text">
+        <h1 class="brand-title">Paris 3D</h1>
+        <span class="brand-subtitle">Échelle réelle 1:1</span>
+      </div>
+    </div>
+
+    <!-- Sélecteur de Monuments de Paris -->
+    <div class="hud-group monument-nav-group">
+      <button
+        type="button"
+        id="btn-monuments-menu"
+        class="monument-picker-btn"
+        aria-expanded="false"
+        aria-controls="monuments-drawer"
+        title="Choisir un monument de Paris"
+      >
+        <span class="monument-dot" aria-hidden="true"></span>
+        <span id="current-monument-label">Saint-Eustache</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        id="btn-quick-hop"
+        class="chip-btn"
+        title="Basculer entre Saint-Eustache, la Tour Eiffel et l'Arc de Triomphe"
+      >
+        <span>⇄ Tour Eiffel</span>
+      </button>
+    </div>
+
+    <!-- Sélecteur de mode caméra -->
+    <div class="hud-group" role="group" aria-label="Mode de caméra">
+      <div class="segmented-control">
+        <button type="button" id="btn-mode-orbit" class="seg-btn active" aria-pressed="true" title="Vue aérienne libre (Touche C)">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" />
+            <ellipse cx="12" cy="12" rx="9" ry="3.5" />
+            <line x1="12" y1="3" x2="12" y2="21" />
+          </svg>
+          <span>Drone</span>
+        </button>
+        <button type="button" id="btn-mode-fps" class="seg-btn" aria-pressed="false" title="Mode visiteur au sol (Touche C)">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="5" r="2.5" />
+            <path d="M9 21l1.5-6-2-2.5 2-4h3l2 4-2 2.5L15 21" />
+          </svg>
+          <span>Piéton</span>
+        </button>
+      </div>
+      <button type="button" id="btn-pointer-lock" class="chip-btn" hidden title="Verrouiller la souris pour regarder à 360° (Échap pour libérer)">
+        <span>Immersion</span>
+      </button>
+    </div>
+
+    <!-- Contrôleur solaire dynamique -->
+    <div class="hud-group solar-control" role="group" aria-label="Cycle solaire">
+      <button type="button" id="btn-sun-play" class="icon-btn" aria-pressed="false" title="Lancer ou mettre en pause la course du soleil">
+        <svg id="icon-play" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+          <polygon points="7,5 19,12 7,19" />
+        </svg>
+        <svg id="icon-pause" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" hidden>
+          <rect x="6" y="5" width="4" height="14" rx="1" />
+          <rect x="14" y="5" width="4" height="14" rx="1" />
+        </svg>
+      </button>
+      <div class="solar-slider-wrap">
+        <div class="solar-meta">
+          <label for="sun-slider" class="solar-label">Soleil</label>
+          <output id="sun-time-display" for="sun-slider" class="solar-time">15h30</output>
+          <span id="sun-phase-badge" class="solar-phase">Après-midi</span>
+        </div>
+        <input
+          type="range"
+          id="sun-slider"
+          min="6"
+          max="22"
+          step="0.05"
+          value="15.5"
+          aria-valuetext="15 heures 30"
+        />
+      </div>
+    </div>
+
+    <!-- Sélecteur qualité graphique + Compteur temps réel FPS / Draw Calls -->
+    <div class="hud-group perf-hud-group" role="group" aria-label="Qualité graphique et performances">
+      <div class="segmented-control quality-control">
+        <button type="button" class="seg-btn quality-btn" data-quality="eco" aria-pressed="false" title="Mode Éco (PC portable sans GPU dédié)">Éco</button>
+        <button type="button" class="seg-btn quality-btn active" data-quality="balanced" aria-pressed="true" title="Mode Équilibré (fluide haute fidélité)">Équilibré</button>
+        <button type="button" class="seg-btn quality-btn" data-quality="ultra" aria-pressed="false" title="Mode Ultra (ombres 4K)">Ultra</button>
+      </div>
+      <output id="perf-readout" class="perf-pill" aria-live="off" aria-label="Images par seconde et appels de rendu">60 FPS • -- DC</output>
+    </div>
+
+    <!-- Indicateur discret des commandes -->
+    <div class="hud-shortcuts" aria-label="Raccourcis clavier">
+      <span class="kbd-hint" id="hint-movement"><kbd>C</kbd> Caméra</span>
+      <button type="button" id="btn-toggle-markers" class="chip-btn active" aria-pressed="true" title="Afficher ou masquer les repères 3D">
+        Repères
+      </button>
+    </div>
+  </header>
+
+  <!-- Menu déroulant "Monuments de Paris" -->
+  <section id="monuments-drawer" class="monuments-drawer glass-panel" hidden aria-label="Catalogue des monuments de Paris">
+    <div class="monuments-drawer-header">
+      <div>
+        <p class="eyebrow">Carte 1:1 de Paris</p>
+        <h2>Monuments Emblématiques</h2>
+      </div>
+      <button type="button" id="btn-close-monuments" class="icon-btn close-btn" aria-label="Fermer la liste des monuments">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <ul id="monuments-list" class="monuments-list"></ul>
+  </section>
+
+  <!-- Barre latérale escamotable : Visite Guidée du monument actif -->
+  <aside id="tour-sidebar" class="tour-sidebar glass-panel" aria-label="Visite touristique guidée">
+    <div class="sidebar-header">
+      <div>
+        <p class="eyebrow">Visite Guidée</p>
+        <h2 id="sidebar-monument-title">Saint-Eustache</h2>
+      </div>
+      <span id="tour-counter" class="tour-counter">0 / 7</span>
+    </div>
+
+    <p class="sidebar-intro">
+      Lance la visite audio guidée (tour 360° historique + les étapes clés), ou clique sur un repère doré.
+    </p>
+
+    <!-- Lecteur Audio-Guide avec Voix Off & Vue 360° -->
+    <div class="audio-guide-box" role="region" aria-label="Lecture audio-guidée avec voix off">
+      <div class="audio-guide-controls">
+        <button type="button" id="btn-tour-play" class="nav-btn primary audio-play-btn">
+          <svg id="tour-icon-play" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+            <polygon points="6,4 20,12 6,20" />
+          </svg>
+          <svg id="tour-icon-pause" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" hidden aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16" rx="1" />
+            <rect x="14" y="4" width="4" height="16" rx="1" />
+          </svg>
+          <span id="tour-play-label">Lancer la visite audio</span>
+        </button>
+        <button type="button" id="btn-tour-stop" class="icon-btn" title="Arrêter la visite audio" disabled aria-label="Arrêter la visite audio">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+            <rect x="6" y="6" width="12" height="12" rx="1.5" />
+          </svg>
+        </button>
+        <button type="button" id="btn-tour-mute" class="icon-btn" aria-pressed="false" title="Couper ou activer la voix off" aria-label="Couper ou activer la voix off">
+          <svg id="tour-icon-sound-on" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          </svg>
+          <svg id="tour-icon-sound-off" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+        </button>
+      </div>
+      <div id="tour-audio-status" class="audio-status" hidden aria-live="polite">
+        <span class="audio-wave" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span id="tour-audio-status-text">Tour 360°…</span>
+      </div>
+    </div>
+
+    <ol id="poi-list" class="poi-list"></ol>
+
+    <div class="sidebar-footer">
+      <button type="button" id="btn-prev-poi" class="nav-btn">← Précédent</button>
+      <button type="button" id="btn-next-poi" class="nav-btn primary">Suivant →</button>
+    </div>
+  </aside>
+
+  <!-- Fiche historique contextuelle (dialogue non-modal natif) -->
+  <dialog id="poi-card" class="poi-card glass-panel" aria-labelledby="poi-card-title">
+    <div class="poi-card-header">
+      <div class="poi-card-meta">
+        <span id="poi-card-index" class="poi-step-badge">Étape 1 / 7</span>
+        <span id="poi-card-era" class="poi-era-badge">Époque</span>
+      </div>
+      <div class="poi-card-header-btns">
+        <button type="button" id="btn-card-speak" class="icon-btn close-btn" aria-label="Lire ou arrêter la voix off de cette étape" title="Écouter cette étape">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          </svg>
+        </button>
+        <button type="button" id="btn-close-card" class="icon-btn close-btn" aria-label="Fermer la fiche historique" title="Fermer">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="6" y1="6" x2="18" y2="18" />
+            <line x1="18" y1="6" x2="6" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <h2 id="poi-card-title" class="poi-card-title">Titre du point d'intérêt</h2>
+    <p id="poi-card-location" class="poi-card-location">Localisation</p>
+
+    <div class="poi-card-body">
+      <p id="poi-card-history" class="poi-history"></p>
+      <div class="poi-anecdote">
+        <span class="anecdote-label">✦ Anecdote architecturale</span>
+        <p id="poi-card-anecdote"></p>
+      </div>
+    </div>
+
+    <div class="poi-card-actions">
+      <button type="button" id="card-prev-btn" class="nav-btn">← Précédent</button>
+      <button type="button" id="card-enter-fps-btn" class="chip-btn" title="Explorer cet endroit à pied">Explorer ici</button>
+      <button type="button" id="card-next-btn" class="nav-btn primary">Suivant →</button>
+    </div>
+  </dialog>
+
+  <!-- Indicateur de zone en bas à gauche -->
+  <div id="zone-indicator" class="zone-pill glass-panel" aria-live="polite">
+    <span class="zone-dot" aria-hidden="true"></span>
+    <span id="zone-text">Paris • Quartier des Halles</span>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
